@@ -1,5 +1,7 @@
 package com.francopaiz.financialManagementAPI.security;
 
+import com.francopaiz.financialManagementAPI.model.User;
+import com.francopaiz.financialManagementAPI.service.usuario.UsuarioService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,6 +20,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
+    @Autowired
+    private UsuarioService userService;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
@@ -26,6 +31,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         // Validate the token and authenticate the user
         if (token != null && jwtTokenUtil.validateToken(token)) {
             String userId = jwtTokenUtil.getUserIdFromToken(token);
+
+            User user = userService.findById(userId);
+
             // Create authentication object
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                     userId, null, null);

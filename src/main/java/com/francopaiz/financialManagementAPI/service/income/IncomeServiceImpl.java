@@ -3,9 +3,13 @@ package com.francopaiz.financialManagementAPI.service.income;
 import com.francopaiz.financialManagementAPI.model.Income;
 import com.francopaiz.financialManagementAPI.model.User;
 import com.francopaiz.financialManagementAPI.repository.income.IncomeRepository;
+import com.francopaiz.financialManagementAPI.repository.usuario.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,6 +18,9 @@ public class IncomeServiceImpl implements IncomeService{
 
     @Autowired
     private  IncomeRepository incomeRepository;
+
+    @Autowired
+    private  UserRepository userRepository;
 
     @Override
     public List<Income> findAll() {
@@ -27,6 +34,21 @@ public class IncomeServiceImpl implements IncomeService{
 
     @Override
     public Income save(Income income) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String authenticatedId = (String) authentication.getPrincipal();
+
+        System.out.println(authenticatedId);
+        User authenticatedUser = userRepository.findById(authenticatedId)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+
+        // Asignar el usuario autenticado al ingreso
+        income.setUser(authenticatedUser);
+
+        if (income.getDate() == null) {
+            income.setDate(LocalDate.now());
+        }
+
         return incomeRepository.save(income);
     }
 
@@ -62,4 +84,22 @@ public class IncomeServiceImpl implements IncomeService{
         incomeRepository.deleteById(id);
     }
 
+
+    @Override
+    public List<Income> findByUser(User user) {
+        return incomeRepository.findByUser(user);
+    }
+
+    @Override
+    public List<Income> findIncomesForAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String authenticatedId = (String) authentication.getPrincipal();
+
+        // Buscar el usuario autenticado
+        User authenticatedUser = userRepository.findById(authenticatedId)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+
+        // Buscar todos los ingresos de este usuario
+        return incomeRepository.findByUser(authenticatedUser);
+    }
 }

@@ -41,4 +41,9 @@ public class IncomeController {
     public void deleteById(@PathVariable String idIncome){
         incomeService.deleteById(idIncome);
     }
+
+    @GetMapping("/my-incomes")
+    public List<Income> findIncomesForAuthenticatedUser() {
+        return incomeService.findIncomesForAuthenticatedUser();
+    }
 }

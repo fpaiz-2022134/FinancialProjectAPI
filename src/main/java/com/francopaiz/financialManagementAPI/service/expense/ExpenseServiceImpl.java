@@ -1,11 +1,17 @@
 package com.francopaiz.financialManagementAPI.service.expense;
 
 import com.francopaiz.financialManagementAPI.model.Expense;
+import com.francopaiz.financialManagementAPI.model.Income;
+import com.francopaiz.financialManagementAPI.model.User;
 import com.francopaiz.financialManagementAPI.repository.expense.ExpenseRepository;
+import com.francopaiz.financialManagementAPI.repository.usuario.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.aggregation.ArithmeticOperators;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -13,6 +19,9 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Autowired
     private ExpenseRepository expenseRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
     public List<Expense> findAll() {
@@ -26,6 +35,20 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public Expense save(Expense expense) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String authenticatedId = (String) authentication.getPrincipal();
+
+        System.out.println("Id del autenticado: " + authenticatedId);
+        User authenticatedUser = userRepository.findById(authenticatedId)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+
+        // Asignar el usuario autenticado al ingreso
+        expense.setUser(authenticatedUser);
+
+        if (expense.getDate() == null) {
+            expense.setDate(LocalDate.now());
+        }
+
         return expenseRepository.save(expense);
     }
 
@@ -60,6 +83,25 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public void deleteById(String id) {
-
+         expenseRepository.deleteById(id);
     }
+
+    @Override
+    public List<Expense> findByUser(User user) {
+        return expenseRepository.findByUser(user);
+    }
+
+    @Override
+    public List<Expense> findIncomesForAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String authenticatedId = (String) authentication.getPrincipal();
+
+        // Buscar el usuario autenticado
+        User authenticatedUser = userRepository.findById(authenticatedId)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+
+        // Buscar todos los ingresos de este usuario
+        return expenseRepository.findByUser(authenticatedUser);
+    }
+
 }

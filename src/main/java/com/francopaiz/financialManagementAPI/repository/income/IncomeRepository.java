@@ -11,6 +11,7 @@ import java.util.List;
 
 @Repository
 public interface IncomeRepository extends MongoRepository <Income, String> {
+    List<Income> findByUser(User user);
 
     List<Income> findByUserAndDateBetween(User user, LocalDate startDate, LocalDate endDate);
 }
