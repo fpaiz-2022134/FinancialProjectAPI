@@ -15,6 +15,10 @@ public class Income {
     private BigDecimal amount;
     private LocalDate date;
     private User user;
+
+    public  Income(){}
+
+
     public Income( String source, BigDecimal amount, LocalDate date, User user) {
         this.source = source;
         this.amount = amount;

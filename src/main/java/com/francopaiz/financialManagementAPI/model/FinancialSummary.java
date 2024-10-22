@@ -18,6 +18,10 @@ public class FinancialSummary {
 
     }
 */
+    public FinancialSummary(){
+
+    }
+
     public FinancialSummary(BigDecimal totalExpenses, BigDecimal totalIncome, BigDecimal balance, Map<Category, BigDecimal> expensesByCategory) {
         this.totalExpenses = totalExpenses;
         this.totalIncome = totalIncome;

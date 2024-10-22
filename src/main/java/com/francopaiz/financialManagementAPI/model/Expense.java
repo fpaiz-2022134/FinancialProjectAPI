@@ -18,7 +18,9 @@ public class Expense {
     private Category category;
     private User user;
 
+    public Expense (){
 
+    }
     public Expense(String description, BigDecimal amount, LocalDate date, Category category, User user) {
         this.description = description;
         this.amount = amount;
