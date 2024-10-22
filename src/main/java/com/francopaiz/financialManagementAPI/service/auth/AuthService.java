@@ -14,7 +14,20 @@ public class AuthService {
     private JwtTokenUtil jwtTokenUtil;
     private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     public String login(String email, String password) {
+
+        // Validar credenciales nulas
+        if (email == null || password == null) {
+            throw new IllegalArgumentException("Email and password cannot be null");
+        }
+
         User user = userRepository.findByEmail(email);
+
+        if (user == null) {
+            throw new RuntimeException("Invalid credentials");
+        }
+
+
+
         System.out.println(password + "  /   "+ user.getPassword());
         if (user != null && passwordEncoder.matches(password, user.getPassword())) {
             System.out.println(user);

@@ -21,8 +21,12 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll()  // Permitir acceso a /usuarios sin autenticación
+                        .requestMatchers("/auth/**", "/").permitAll()  // Permitir acceso a /usuarios sin autenticación
                         .requestMatchers("/api/v1/users/**").authenticated()
+                        .requestMatchers("/api/v1/categories/**").authenticated()
+                        .requestMatchers("/api/v1/incomes/**").authenticated()
+                        .requestMatchers("/api/v1/expenses/**").authenticated()
+                        .requestMatchers("/api/v1/summaries/**").authenticated()
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
