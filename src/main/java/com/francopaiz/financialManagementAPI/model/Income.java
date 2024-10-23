@@ -1,11 +1,11 @@
 package com.francopaiz.financialManagementAPI.model;
 
+import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-
 
 @Document(collection = "incomes")
 public class Income {
@@ -16,10 +16,12 @@ public class Income {
     private LocalDate date;
     private User user;
 
-    public  Income(){}
 
+    public Income() {
+    }
 
-    public Income( String source, BigDecimal amount, LocalDate date, User user) {
+    public Income(String id, String source, BigDecimal amount, LocalDate date, User user) {
+        this.id = id;
         this.source = source;
         this.amount = amount;
         this.date = date;

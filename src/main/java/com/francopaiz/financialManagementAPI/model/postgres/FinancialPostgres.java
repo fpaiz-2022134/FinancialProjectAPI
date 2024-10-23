@@ -1,27 +1,38 @@
-package com.francopaiz.financialManagementAPI.model;
+package com.francopaiz.financialManagementAPI.model.postgres;
 
-import lombok.AllArgsConstructor;
+import com.francopaiz.financialManagementAPI.model.Category;
+import jakarta.persistence.*;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
 import java.util.Map;
 
-/*@Data
-@AllArgsConstructor // Genera un constructor con todos los argumentos
-@NoArgsConstructor  // Genera el constructor sin argumentos*/
-public class FinancialSummary {
+@Entity
+@Table(name = "summary")
+public class FinancialPostgres {
+    
 
+    @Column(name = "total_expenses", nullable = false)
     private BigDecimal totalExpenses;
+
+    @Column(name = "total_income", nullable = false)
     private BigDecimal totalIncome;
-    private BigDecimal balance; //Incomes - expenses
+
+    @Column(name = "balance", nullable = false)
+    private BigDecimal balance; // Incomes - expenses
+
+    // Map cannot be directly persisted, so we'll use @ElementCollection for a map of basic or embeddable types
+    @ElementCollection
+    @CollectionTable(name = "expenses_by_category", joinColumns = @JoinColumn(name = "summary_id"))
+    @MapKeyJoinColumn(name = "category_id") // Assuming Category is an entity
+    @Column(name = "expense_amount")
     private Map<Category, BigDecimal> expensesByCategory;
 
-    public FinancialSummary() {
+
+    public FinancialPostgres() {
     }
 
-    public FinancialSummary(BigDecimal totalExpenses, BigDecimal totalIncome, BigDecimal balance, Map<Category, BigDecimal> expensesByCategory) {
+    public FinancialPostgres(BigDecimal totalExpenses, BigDecimal totalIncome, BigDecimal balance, Map<Category, BigDecimal> expensesByCategory) {
         this.totalExpenses = totalExpenses;
         this.totalIncome = totalIncome;
         this.balance = balance;
@@ -60,4 +71,3 @@ public class FinancialSummary {
         this.expensesByCategory = expensesByCategory;
     }
 }
-

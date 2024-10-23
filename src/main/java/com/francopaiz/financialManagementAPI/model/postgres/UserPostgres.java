@@ -1,23 +1,35 @@
-package com.francopaiz.financialManagementAPI.model;
+package com.francopaiz.financialManagementAPI.model.postgres;
 
+import jakarta.persistence.*;
 import lombok.Data;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-public class User {
+@Data
+@Entity
+@Table(name = "users")
+public class UserPostgres {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "name", nullable = false)
     private String name;
+
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
+
+    @Column(name = "password", nullable = false)
     private String password;
+
+    @Column(name = "phone")
     private String phone;
 
-    public User() {
+
+    public UserPostgres() {
     }
 
-    public User(String id, String name, String email, String password, String phone) {
+    public UserPostgres(Long id, String name, String email, String password, String phone) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -25,11 +37,11 @@ public class User {
         this.phone = phone;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -61,9 +73,8 @@ public class User {
         this.phone = phone;
     }
 
+    // Método para encriptar la contraseña usando BCrypt
     public void setPassword(String password) {
-        // Aplicar cifrado de BCrypt siempre que se cambie la contraseña
         this.password = new BCryptPasswordEncoder().encode(password);
     }
-
 }

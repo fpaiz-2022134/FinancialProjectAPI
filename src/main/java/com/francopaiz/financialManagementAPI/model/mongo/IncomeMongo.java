@@ -1,5 +1,6 @@
-package com.francopaiz.financialManagementAPI.model;
+package com.francopaiz.financialManagementAPI.model.mongo;
 
+import com.francopaiz.financialManagementAPI.model.User;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -7,25 +8,24 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public class Expense {
-
+@Data
+@Document(collection = "incomes")
+public class IncomeMongo{
+    @Id
     private String id;
-    private String description;
+    private String source;
     private BigDecimal amount;
     private LocalDate date;
-    private Category category;
     private User user;
 
-
-    public Expense() {
+    public IncomeMongo() {
     }
 
-    public Expense(String id, String description, BigDecimal amount, LocalDate date, Category category, User user) {
+    public IncomeMongo(String id, String source, BigDecimal amount, LocalDate date, User user) {
         this.id = id;
-        this.description = description;
+        this.source = source;
         this.amount = amount;
         this.date = date;
-        this.category = category;
         this.user = user;
     }
 
@@ -37,12 +37,12 @@ public class Expense {
         this.id = id;
     }
 
-    public String getDescription() {
-        return description;
+    public String getSource() {
+        return source;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setSource(String source) {
+        this.source = source;
     }
 
     public BigDecimal getAmount() {
@@ -61,14 +61,6 @@ public class Expense {
         this.date = date;
     }
 
-    public Category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-
     public User getUser() {
         return user;
     }
@@ -77,3 +69,5 @@ public class Expense {
         this.user = user;
     }
 }
+
+

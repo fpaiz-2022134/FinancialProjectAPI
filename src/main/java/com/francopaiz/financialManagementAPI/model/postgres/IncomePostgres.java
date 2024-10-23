@@ -1,6 +1,5 @@
 package com.francopaiz.financialManagementAPI.model.postgres;
 
-import com.francopaiz.financialManagementAPI.model.Category;
 import com.francopaiz.financialManagementAPI.model.User;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -8,37 +7,36 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-
+@Data
 @Entity
-@Table(name = "expense")
-public class ExpensePostgres{
+@Table(name = "incomes")
+public class IncomePostgres {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String description;
+    @Column(name = "source", nullable = false)
+    private String source;
+
+    @Column(name = "amount", nullable = false)
     private BigDecimal amount;
+
+    @Column(name = "date", nullable = false)
     private LocalDate date;
 
     @ManyToOne
-    @JoinColumn(name = "category_id")
-    private Category category;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-
-    public ExpensePostgres() {
+    public IncomePostgres() {
     }
 
-    public ExpensePostgres(Long id, String description, BigDecimal amount, LocalDate date, Category category, User user) {
+    public IncomePostgres(Long id, String source, BigDecimal amount, LocalDate date, User user) {
         this.id = id;
-        this.description = description;
+        this.source = source;
         this.amount = amount;
         this.date = date;
-        this.category = category;
         this.user = user;
     }
 
@@ -50,12 +48,12 @@ public class ExpensePostgres{
         this.id = id;
     }
 
-    public String getDescription() {
-        return description;
+    public String getSource() {
+        return source;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setSource(String source) {
+        this.source = source;
     }
 
     public BigDecimal getAmount() {
@@ -72,14 +70,6 @@ public class ExpensePostgres{
 
     public void setDate(LocalDate date) {
         this.date = date;
-    }
-
-    public Category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
     }
 
     public User getUser() {

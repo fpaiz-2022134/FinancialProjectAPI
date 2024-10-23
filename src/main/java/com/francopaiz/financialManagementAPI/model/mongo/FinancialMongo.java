@@ -1,27 +1,24 @@
-package com.francopaiz.financialManagementAPI.model;
+package com.francopaiz.financialManagementAPI.model.mongo;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.francopaiz.financialManagementAPI.model.Category;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
 import java.util.Map;
 
-/*@Data
-@AllArgsConstructor // Genera un constructor con todos los argumentos
-@NoArgsConstructor  // Genera el constructor sin argumentos*/
-public class FinancialSummary {
+@Document(collection = "summary")
+public class FinancialMongo {
 
     private BigDecimal totalExpenses;
     private BigDecimal totalIncome;
     private BigDecimal balance; //Incomes - expenses
     private Map<Category, BigDecimal> expensesByCategory;
 
-    public FinancialSummary() {
+
+    public FinancialMongo() {
     }
 
-    public FinancialSummary(BigDecimal totalExpenses, BigDecimal totalIncome, BigDecimal balance, Map<Category, BigDecimal> expensesByCategory) {
+    public FinancialMongo(BigDecimal totalExpenses, BigDecimal totalIncome, BigDecimal balance, Map<Category, BigDecimal> expensesByCategory) {
         this.totalExpenses = totalExpenses;
         this.totalIncome = totalIncome;
         this.balance = balance;
@@ -60,4 +57,5 @@ public class FinancialSummary {
         this.expensesByCategory = expensesByCategory;
     }
 }
+
 

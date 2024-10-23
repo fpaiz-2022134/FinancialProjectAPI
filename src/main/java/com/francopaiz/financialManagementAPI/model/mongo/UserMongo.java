@@ -1,11 +1,14 @@
-package com.francopaiz.financialManagementAPI.model;
+package com.francopaiz.financialManagementAPI.model.mongo;
+
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-public class User {
+@Data
+@Document(collection = "users")
+public class UserMongo {
 
     @Id
     private String id;
@@ -14,10 +17,10 @@ public class User {
     private String password;
     private String phone;
 
-    public User() {
+    public UserMongo() {
     }
 
-    public User(String id, String name, String email, String password, String phone) {
+    public UserMongo(String id, String name, String email, String password, String phone) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -53,6 +56,10 @@ public class User {
         return password;
     }
 
+    public void setPassword(String password) {
+        // Aplicar cifrado de BCrypt siempre que se cambie la contraseña
+        this.password = new BCryptPasswordEncoder().encode(password);
+    }
     public String getPhone() {
         return phone;
     }
@@ -60,10 +67,4 @@ public class User {
     public void setPhone(String phone) {
         this.phone = phone;
     }
-
-    public void setPassword(String password) {
-        // Aplicar cifrado de BCrypt siempre que se cambie la contraseña
-        this.password = new BCryptPasswordEncoder().encode(password);
-    }
-
 }

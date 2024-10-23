@@ -4,9 +4,13 @@ package com.francopaiz.financialManagementAPI.model.postgres;
 // Importa las anotaciones de JPA.
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 @Data
 @Entity
 @Table(name = "category")
@@ -17,4 +21,29 @@ public class CategoryPostgres {
     private Long id;
 
     private String name;
+
+
+    public CategoryPostgres() {
+    }
+
+    public CategoryPostgres(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }
