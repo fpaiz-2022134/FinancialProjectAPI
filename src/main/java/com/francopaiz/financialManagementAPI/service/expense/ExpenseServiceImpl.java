@@ -24,22 +24,22 @@ public class ExpenseServiceImpl implements ExpenseService {
     private UserRepository userRepository;
 
     @Override
-    public List<Expense> findAll() {
-        return expenseRepository.findAll();
+    public List<Expense> getExpenses() {
+        return expenseRepository.getExpenses();
     }
 
     @Override
-    public Expense findById(String id) {
-        return expenseRepository.findById(id).orElse(null);
+    public Expense findExpenseById(String id) {
+        return expenseRepository.findExpenseById(id).orElse(null);
     }
 
     @Override
-    public Expense save(Expense expense) {
+    public Expense createExpense(Expense expense) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String authenticatedId = (String) authentication.getPrincipal();
 
         System.out.println("Id del autenticado: " + authenticatedId);
-        User authenticatedUser = userRepository.findById(authenticatedId)
+        User authenticatedUser = userRepository.findUserById(authenticatedId)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
         // Asignar el usuario autenticado al ingreso
@@ -49,13 +49,13 @@ public class ExpenseServiceImpl implements ExpenseService {
             expense.setDate(LocalDate.now());
         }
 
-        return expenseRepository.save(expense);
+        return expenseRepository.createExpense(expense);
     }
 
     @Override
-    public Expense update(String id, Expense expense) {
+    public Expense updateExpense(String id, Expense expense) {
 
-        Expense existingExpense = expenseRepository.findById(id).orElseThrow(()-> new IllegalArgumentException("Gasto no encontrado"));
+        Expense existingExpense = expenseRepository.findExpenseById(id).orElseThrow(()-> new IllegalArgumentException("Gasto no encontrado"));
 
         if(expense.getDescription()!= null){
             existingExpense.setDescription(expense.getDescription());
@@ -78,12 +78,12 @@ public class ExpenseServiceImpl implements ExpenseService {
         }
 
 
-        return expenseRepository.save(existingExpense);
+        return expenseRepository.updateExpense(existingExpense);
     }
 
     @Override
-    public void deleteById(String id) {
-         expenseRepository.deleteById(id);
+    public void deleteExpense(String id) {
+         expenseRepository.deleteExpense(id);
     }
 
     @Override
@@ -92,12 +92,12 @@ public class ExpenseServiceImpl implements ExpenseService {
     }
 
     @Override
-    public List<Expense> findIncomesForAuthenticatedUser() {
+    public List<Expense> findExpensesForAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String authenticatedId = (String) authentication.getPrincipal();
 
         // Buscar el usuario autenticado
-        User authenticatedUser = userRepository.findById(authenticatedId)
+        User authenticatedUser = userRepository.findUserById(authenticatedId)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
         // Buscar todos los ingresos de este usuario

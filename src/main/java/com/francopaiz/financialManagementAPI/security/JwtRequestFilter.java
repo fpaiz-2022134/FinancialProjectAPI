@@ -1,7 +1,7 @@
 package com.francopaiz.financialManagementAPI.security;
 
-import com.francopaiz.financialManagementAPI.model.User;
-import com.francopaiz.financialManagementAPI.service.usuario.UsuarioService;
+import com.francopaiz.financialManagementAPI.dto.user.UserResponse;
+import com.francopaiz.financialManagementAPI.service.user.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,33 +17,38 @@ import java.io.IOException;
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
+
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
     @Autowired
-    private UsuarioService userService;
+    private UserService userService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        // Extract the token from the header with the key 'token'
+        // Extraer el token del encabezado 'token'
         String token = request.getHeader("token");
-        // Validate the token and authenticate the user
+
+        // Validar el token y autenticar al usuario
         if (token != null && jwtTokenUtil.validateToken(token)) {
             String userId = jwtTokenUtil.getUserIdFromToken(token);
 
-            User user = userService.findById(userId);
+            // Buscar el usuario usando el servicio de usuario
+            UserResponse userResponse = userService.findUserById(userId);
 
-            // Create authentication object
+            // Crear el objeto de autenticación
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    userId, null, null);
+                    userResponse.getId(), null, null);
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            // Set the authentication in the security context
+
+            // Establecer la autenticación en el contexto de seguridad
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
         chain.doFilter(request, response);
     }
-    // Method to extract the token from the header
+
+    // Método para extraer el token del encabezado
     private String extractJwtFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {

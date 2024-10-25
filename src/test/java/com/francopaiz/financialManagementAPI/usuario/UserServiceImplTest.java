@@ -2,7 +2,7 @@ package com.francopaiz.financialManagementAPI.usuario;
 
 import com.francopaiz.financialManagementAPI.model.User;
 import com.francopaiz.financialManagementAPI.repository.usuario.UserRepository;
-import com.francopaiz.financialManagementAPI.service.usuario.UsuarioServiceImpl;
+import com.francopaiz.financialManagementAPI.service.user.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -16,13 +16,13 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class UsuarioServiceImplTest {
+class UserServiceImplTest {
 
     @Mock
     private UserRepository userRepository;
 
     @InjectMocks
-    private UsuarioServiceImpl usuarioService;
+    private UserServiceImpl usuarioService;
 
     private User user;
 

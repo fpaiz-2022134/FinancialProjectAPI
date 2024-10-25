@@ -2,7 +2,7 @@ package com.francopaiz.financialManagementAPI.usuario;
 
 import com.francopaiz.financialManagementAPI.model.User;
 import com.francopaiz.financialManagementAPI.repository.usuario.UserRepository;
-import com.francopaiz.financialManagementAPI.service.usuario.UsuarioServiceImpl;
+import com.francopaiz.financialManagementAPI.service.user.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -18,13 +18,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-class UsuarioServiceTest {
+class UserServiceTest {
 
     @Mock
     private UserRepository usuarioRepository;
 
     @InjectMocks
-    private UsuarioServiceImpl usuarioService;
+    private UserServiceImpl usuarioService;
 
     private User user;
 

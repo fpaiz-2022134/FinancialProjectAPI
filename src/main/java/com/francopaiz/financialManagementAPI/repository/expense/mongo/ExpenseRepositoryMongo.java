@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
  * con los gastos en una base de datos MongoDB.
  */
 @Profile("mongo") // Activa esta implementación cuando el perfil 'mongo' está activo.
-@RequiredArgsConstructor
 @Repository // Indica que esta clase es un repositorio de acceso a datos.
 public class ExpenseRepositoryMongo implements ExpenseRepository {
 

@@ -1,5 +1,6 @@
 package com.francopaiz.financialManagementAPI.caster;
 
+import com.francopaiz.financialManagementAPI.dto.user.UserResponse;
 import com.francopaiz.financialManagementAPI.model.User;
 import com.francopaiz.financialManagementAPI.model.mongo.UserMongo;
 import com.francopaiz.financialManagementAPI.model.postgres.UserPostgres;
@@ -106,5 +107,19 @@ public class UserCaster {
         userMongo.setPassword(userPostgres.getPassword()); // Se mantendrá codificada
         userMongo.setPhone(userPostgres.getPhone());
         return userMongo;
+    }
+
+    /**
+     * Convierte un objeto User a un objeto UserResponse.
+     *
+     * @param user El objeto User que se va a convertir.
+     * @return Un objeto UserResponse que representa la respuesta del usuario.
+     */
+    public UserResponse userToUserResponse(User user) {
+        UserResponse userResponse = new UserResponse();
+        userResponse.setId(user.getId());
+        userResponse.setName(user.getName());
+        userResponse.setEmail(user.getEmail());
+        return userResponse;
     }
 }

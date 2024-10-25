@@ -3,7 +3,7 @@ package com.francopaiz.financialManagementAPI.controller.financial;
 import com.francopaiz.financialManagementAPI.model.FinancialSummary;
 import com.francopaiz.financialManagementAPI.model.User;
 import com.francopaiz.financialManagementAPI.service.financial.FinanceService;
-import com.francopaiz.financialManagementAPI.service.usuario.UsuarioService;
+import com.francopaiz.financialManagementAPI.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +19,7 @@ public class FinanceController {
     private FinanceService financialService;
 
     @Autowired
-    private UsuarioService usuarioService;
+    private UserService userService;
 
     @GetMapping("/{userId}")
     public ResponseEntity<FinancialSummary> getFinancialSummary(
@@ -27,7 +27,7 @@ public class FinanceController {
             @RequestParam("from") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam("to") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
 
-        User userFound = usuarioService.findById(userId);
+        User userFound = userService.findById(userId);
 
         FinancialSummary summary = financialService.generateSummary(userFound, from, to);
         return ResponseEntity.ok(summary);

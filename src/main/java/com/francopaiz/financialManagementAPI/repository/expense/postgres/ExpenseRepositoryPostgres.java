@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
  * con los gastos en una base de datos PostgreSQL.
  */
 @Profile("postgres") // Activa esta implementación cuando el perfil 'postgres' está activo.
-@RequiredArgsConstructor
 @Repository // Indica que esta clase es un repositorio de acceso a datos.
 public class ExpenseRepositoryPostgres implements ExpenseRepository {
 

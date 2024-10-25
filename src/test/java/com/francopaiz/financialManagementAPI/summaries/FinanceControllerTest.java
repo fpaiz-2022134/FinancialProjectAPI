@@ -4,7 +4,7 @@ import com.francopaiz.financialManagementAPI.controller.financial.FinanceControl
 import com.francopaiz.financialManagementAPI.model.FinancialSummary;
 import com.francopaiz.financialManagementAPI.model.User;
 import com.francopaiz.financialManagementAPI.service.financial.FinanceService;
-import com.francopaiz.financialManagementAPI.service.usuario.UsuarioService;
+import com.francopaiz.financialManagementAPI.service.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -26,7 +26,7 @@ class FinanceControllerTest {
     private FinanceService financeService;
 
     @Mock
-    private UsuarioService usuarioService;
+    private UserService userService;
 
     @InjectMocks
     private FinanceController financeController;
@@ -55,7 +55,7 @@ class FinanceControllerTest {
         LocalDate from = LocalDate.of(2023, 1, 1);
         LocalDate to = LocalDate.of(2023, 12, 31);
 
-        when(usuarioService.findById("1")).thenReturn(user);
+        when(userService.findById("1")).thenReturn(user);
         when(financeService.generateSummary(any(User.class), eq(from), eq(to)))
                 .thenReturn(financialSummary);
 
@@ -67,7 +67,7 @@ class FinanceControllerTest {
         assertEquals(new BigDecimal("1000.00"), response.getBody().getTotalIncome());
         assertEquals(new BigDecimal("500.00"), response.getBody().getTotalExpenses());
         assertEquals(new BigDecimal("500.00"), response.getBody().getBalance());
-        verify(usuarioService, times(1)).findById("1");
+        verify(userService, times(1)).findById("1");
         verify(financeService, times(1)).generateSummary(any(User.class), eq(from), eq(to));
     }
 }
