@@ -122,4 +122,26 @@ public class UserCaster {
         userResponse.setEmail(user.getEmail());
         return userResponse;
     }
+
+
+    /**
+     * Convierte un objeto UserResponse a un objeto User.
+     *
+     * @param userResponse El objeto UserResponse que se va a convertir.
+     * @return Un objeto User que representa el usuario.
+     */
+    public User userResponseToUser(UserResponse userResponse) {
+        // Verifica que el objeto userResponse no sea nulo
+        if (userResponse == null) {
+            return null;  // O lanza una excepción, dependiendo de la lógica
+        }
+
+        // Crea un nuevo User y establece los valores
+        User user = new User();
+        user.setId(userResponse.getId());
+        user.setName(userResponse.getName());
+        user.setEmail(userResponse.getEmail());
+
+        return user;
+    }
 }

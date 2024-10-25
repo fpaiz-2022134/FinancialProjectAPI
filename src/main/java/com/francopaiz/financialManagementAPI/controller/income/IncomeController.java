@@ -18,28 +18,28 @@ public class IncomeController {
 
     @GetMapping
     public List<Income> findAll() {
-        return incomeService.findAll();
+        return incomeService.getIncomes();
     }
 
     @GetMapping("/{idIncome}")
     public Income findById(@PathVariable String idIncome)
     {
-        return incomeService.findById(idIncome);
+        return incomeService.findIncomeById(idIncome);
     }
 
     @PostMapping()
     public Income save(@RequestBody Income income){
-        return incomeService.save(income);
+        return incomeService.createIncome(income);
     }
 
     @PutMapping("/{idIncome}")
     public Income update(@PathVariable String idIncome,@RequestBody Income income){
-        return incomeService.update(idIncome, income);
+        return incomeService.updateIncome(idIncome, income);
     }
 
     @DeleteMapping("/{idIncome}")
     public void deleteById(@PathVariable String idIncome){
-        incomeService.deleteById(idIncome);
+        incomeService.deleteIncome(idIncome);
     }
 
     @GetMapping("/my-incomes")

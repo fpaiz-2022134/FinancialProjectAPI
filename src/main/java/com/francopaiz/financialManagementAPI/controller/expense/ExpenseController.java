@@ -22,38 +22,38 @@ public class ExpenseController {
 
     @GetMapping
     public List<Expense> findAll(){
-        return expenseService.findAll();
+        return expenseService.getExpenses();
     }
 
     @GetMapping("/{idExpense}")
     public Expense findById(@PathVariable String idExpense){
-        return expenseService.findById(idExpense);
+        return expenseService.findExpenseById(idExpense);
     }
 
     @PostMapping("/{idCategory}")
     public Expense save (@PathVariable String idCategory, @RequestBody Expense expense){
 
         if (expense.getCategory() ==null){
-            Category categoryFound = categoryService.findById(idCategory);
+            Category categoryFound = categoryService.findCategoryById(idCategory);
             System.out.println(categoryFound);
             expense.setCategory(categoryFound);
         }
 
-        return expenseService.save(expense);
+        return expenseService.createExpense(expense);
     }
 
     @PutMapping("/{idExpense}")
     public Expense update(@PathVariable String idExpense, @RequestBody Expense expense){
-        return expenseService.update(idExpense, expense);
+        return expenseService.updateExpense(idExpense, expense);
     }
 
     @DeleteMapping("/{idExpense}")
     public void deleteById(@PathVariable String idExpense){
-        expenseService.deleteById(idExpense);
+        expenseService.deleteExpense(idExpense);
     }
 
     @GetMapping("/my-expenses")
     public List<Expense> findIncomesForAuthenticatedUser() {
-        return expenseService.findIncomesForAuthenticatedUser();
+        return expenseService.findExpensesForAuthenticatedUser();
     }
 }

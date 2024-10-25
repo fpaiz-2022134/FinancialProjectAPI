@@ -17,26 +17,26 @@ public class CategoryController {
 
     @GetMapping
     public List<Category> findAll(){
-        return categoryService.findAll();
+        return categoryService.getCategories();
     }
 
     @GetMapping("/{idCategory}")
     public Category findById(@PathVariable String idCategory){
-        return categoryService.findById(idCategory);
+        return categoryService.findCategoryById(idCategory);
     }
 
     @PostMapping()
     public Category save(@RequestBody Category category){
-        return categoryService.save(category);
+        return categoryService.createCategory(category);
     }
 
     @PutMapping("/{idCategory}")
     public Category update(@PathVariable String idCategory, @RequestBody Category category){
-        return categoryService.update(idCategory, category);
+        return categoryService.updateCategory(idCategory, category);
     }
 
     @DeleteMapping("/{idCategory}")
     public void deleteById(@PathVariable String idCategory){
-        categoryService.deleteById(idCategory);
+        categoryService.deleteCategory(idCategory);
     }
 }

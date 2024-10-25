@@ -23,23 +23,23 @@ public class IncomeServiceImpl implements IncomeService{
     private  UserRepository userRepository;
 
     @Override
-    public List<Income> findAll() {
-        return incomeRepository.findAll();
+    public List<Income> getIncomes() {
+        return incomeRepository.getIncomes();
     }
 
     @Override
-    public Income findById(String id) {
-        return incomeRepository.findById(id).orElse(null);
+    public Income findIncomeById(String id) {
+        return incomeRepository.findIncomeById(id).orElse(null);
     }
 
     @Override
-    public Income save(Income income) {
+    public Income createIncome(Income income) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String authenticatedId = (String) authentication.getPrincipal();
 
         System.out.println(authenticatedId);
-        User authenticatedUser = userRepository.findById(authenticatedId)
+        User authenticatedUser = userRepository.findUserById(authenticatedId)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
         // Asignar el usuario autenticado al ingreso
@@ -49,12 +49,12 @@ public class IncomeServiceImpl implements IncomeService{
             income.setDate(LocalDate.now());
         }
 
-        return incomeRepository.save(income);
+        return incomeRepository.createIncome(income);
     }
 
     @Override
-    public Income update(String id, Income income) {
-        Income existingIncome = incomeRepository.findById(id).orElseThrow(()-> new IllegalArgumentException("Ingreso no encontrado"));
+    public Income updateIncome(String id, Income income) {
+        Income existingIncome = incomeRepository.findIncomeById(id).orElseThrow(()-> new IllegalArgumentException("Ingreso no encontrado"));
 
         if(income.getAmount()!= null){
             existingIncome.setAmount(income.getAmount());
@@ -76,12 +76,12 @@ public class IncomeServiceImpl implements IncomeService{
             existingIncome.setUser(income.getUser());
         }
 
-        return incomeRepository.save(existingIncome);
+        return incomeRepository.updateIncome(existingIncome);
     }
 
     @Override
-    public void deleteById(String id) {
-        incomeRepository.deleteById(id);
+    public void deleteIncome(String id) {
+        incomeRepository.deleteIncome(id);
     }
 
 
@@ -96,7 +96,7 @@ public class IncomeServiceImpl implements IncomeService{
         String authenticatedId = (String) authentication.getPrincipal();
 
         // Buscar el usuario autenticado
-        User authenticatedUser = userRepository.findById(authenticatedId)
+        User authenticatedUser = userRepository.findUserById(authenticatedId)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
         // Buscar todos los ingresos de este usuario

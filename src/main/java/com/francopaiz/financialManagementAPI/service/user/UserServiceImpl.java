@@ -30,6 +30,15 @@ public class UserServiceImpl implements UserService {
     @Value("${spring.profiles.active}")
     private String profile;
 
+    @Override
+    public UserResponse saveUser(User user) {
+        // Guardar el objeto User en el repositorio
+        User savedUser = userRepository.createUser(user);
+
+        // Convertir el User guardado en un UserResponse y devolverlo
+        return userCaster.userToUserResponse(savedUser);
+    }
+
     /**
      * Obtiene una lista de todos los usuarios disponibles en el sistema.
      *
@@ -61,6 +70,11 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findUserById(idUser)
                 .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND + idUser));
         return userCaster.userToUserResponse(user);
+    }
+
+    @Override
+    public User findById(String idUser) {
+        return null;
     }
 
     /**

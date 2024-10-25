@@ -1,5 +1,7 @@
 package com.francopaiz.financialManagementAPI.controller.financial;
 
+import com.francopaiz.financialManagementAPI.caster.UserCaster;
+import com.francopaiz.financialManagementAPI.dto.user.UserResponse;
 import com.francopaiz.financialManagementAPI.model.FinancialSummary;
 import com.francopaiz.financialManagementAPI.model.User;
 import com.francopaiz.financialManagementAPI.service.financial.FinanceService;
@@ -21,15 +23,19 @@ public class FinanceController {
     @Autowired
     private UserService userService;
 
+    UserCaster userCaster;
+
     @GetMapping("/{userId}")
     public ResponseEntity<FinancialSummary> getFinancialSummary(
             @PathVariable String userId,
             @RequestParam("from") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam("to") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
 
-        User userFound = userService.findById(userId);
+        UserResponse userFound = userService.findUserById(userId);
 
-        FinancialSummary summary = financialService.generateSummary(userFound, from, to);
+        User userTransformed = userCaster.userResponseToUser(userFound);
+
+        FinancialSummary summary = financialService.generateSummary(userTransformed, from, to);
         return ResponseEntity.ok(summary);
     }
 }

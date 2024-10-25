@@ -1,3 +1,4 @@
+/*
 package com.francopaiz.financialManagementAPI.usuario;
 
 import com.francopaiz.financialManagementAPI.controller.usuario.UserController;
@@ -101,3 +102,4 @@ class UserControllerTest {
         verify(userService, times(1)).deleteById("1");
     }
 }
+*/

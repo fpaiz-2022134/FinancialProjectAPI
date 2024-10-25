@@ -13,6 +13,8 @@ import java.util.Optional;
  */
 public interface IncomeRepository {
 
+
+
     /**
      * Crea un nuevo ingreso en el repositorio.
      *

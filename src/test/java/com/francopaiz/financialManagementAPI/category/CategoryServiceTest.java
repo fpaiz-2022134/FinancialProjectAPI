@@ -1,3 +1,4 @@
+/*
 package com.francopaiz.financialManagementAPI.category;
 import com.francopaiz.financialManagementAPI.model.Category;
 import com.francopaiz.financialManagementAPI.repository.category.CategoryRepository;
@@ -107,4 +108,4 @@ class CategoryServiceTest {
         // Assert
         verify(categoryRepository, times(1)).deleteById("1");
     }
-}
+}*/

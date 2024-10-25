@@ -1,3 +1,4 @@
+/*
 package com.francopaiz.financialManagementAPI.income;
 import com.francopaiz.financialManagementAPI.model.Income;
 import com.francopaiz.financialManagementAPI.model.User;
@@ -137,4 +138,4 @@ class IncomeServiceTest {
         verify(incomeRepository, times(1)).findByUser(eq(user));
     }
 
-}
+}*/

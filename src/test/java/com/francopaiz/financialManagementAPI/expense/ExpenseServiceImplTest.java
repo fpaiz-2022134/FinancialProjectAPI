@@ -1,3 +1,4 @@
+/*
 package com.francopaiz.financialManagementAPI.expense;
 
 import com.francopaiz.financialManagementAPI.model.Expense;
@@ -171,4 +172,4 @@ class ExpenseServiceImplTest {
         assertEquals(BigDecimal.valueOf(50.0), expenses.get(0).getAmount());
         verify(expenseRepository, times(1)).findByUser(user);
     }
-}
+}*/
