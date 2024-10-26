@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@Document(collection = "incomes")
+/*@Document(collection = "incomes")*/
 public class Income {
     @Id
     private String id;

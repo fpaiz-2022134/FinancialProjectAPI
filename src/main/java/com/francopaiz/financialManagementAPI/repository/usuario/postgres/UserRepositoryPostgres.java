@@ -18,12 +18,16 @@ import java.util.stream.Collectors;
  * y utiliza un repositorio JPA para acceder a los datos de los usuarios.
  */
 @Profile("postgres")
+
 @RequiredArgsConstructor
+
 @Repository
 public class UserRepositoryPostgres implements UserRepository {
 
     private final UserRepositoryJpa userRepositoryJpa; // Repositorio JPA para operaciones CRUD
     private final UserCaster userCaster; // Utilidad para convertir entre User y UserPostgres
+
+
 
     /**
      * Crea un nuevo usuario en la base de datos.

@@ -5,6 +5,7 @@ import com.francopaiz.financialManagementAPI.model.User;
 import com.francopaiz.financialManagementAPI.repository.income.IncomeRepository;
 import com.francopaiz.financialManagementAPI.repository.usuario.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -14,13 +15,16 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class IncomeServiceImpl implements IncomeService{
+public class IncomeServiceImpl implements IncomeService {
 
     @Autowired
-    private  IncomeRepository incomeRepository;
+    private IncomeRepository incomeRepository;
 
     @Autowired
-    private  UserRepository userRepository;
+    private UserRepository userRepository;
+
+    @Value("${spring.profiles.active}")
+    private String profile;
 
     @Override
     public List<Income> getIncomes() {
@@ -29,20 +33,18 @@ public class IncomeServiceImpl implements IncomeService{
 
     @Override
     public Income findIncomeById(String id) {
+        validateIdFormat(id);  // Verifica el formato del ID
         return incomeRepository.findIncomeById(id).orElse(null);
     }
 
     @Override
     public Income createIncome(Income income) {
-
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String authenticatedId = (String) authentication.getPrincipal();
 
-        System.out.println(authenticatedId);
         User authenticatedUser = userRepository.findUserById(authenticatedId)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
-        // Asignar el usuario autenticado al ingreso
         income.setUser(authenticatedUser);
 
         if (income.getDate() == null) {
@@ -54,25 +56,24 @@ public class IncomeServiceImpl implements IncomeService{
 
     @Override
     public Income updateIncome(String id, Income income) {
-        Income existingIncome = incomeRepository.findIncomeById(id).orElseThrow(()-> new IllegalArgumentException("Ingreso no encontrado"));
+        validateIdFormat(id);  // Verifica el formato del ID
 
-        if(income.getAmount()!= null){
+        Income existingIncome = incomeRepository.findIncomeById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Ingreso no encontrado"));
+
+        if (income.getAmount() != null) {
             existingIncome.setAmount(income.getAmount());
         }
 
-        if (income.getDate()!= null){
+        if (income.getDate() != null) {
             existingIncome.setDate(income.getDate());
         }
 
-        if(income.getSource()!= null){
+        if (income.getSource() != null) {
             existingIncome.setSource(income.getSource());
         }
 
-        if (income.getAmount()!= null){
-            existingIncome.setAmount(income.getAmount());
-        }
-
-        if (income.getUser()!= null){
+        if (income.getUser() != null) {
             existingIncome.setUser(income.getUser());
         }
 
@@ -81,9 +82,9 @@ public class IncomeServiceImpl implements IncomeService{
 
     @Override
     public void deleteIncome(String id) {
+        validateIdFormat(id);  // Verifica el formato del ID
         incomeRepository.deleteIncome(id);
     }
-
 
     @Override
     public List<Income> findByUser(User user) {
@@ -95,11 +96,19 @@ public class IncomeServiceImpl implements IncomeService{
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String authenticatedId = (String) authentication.getPrincipal();
 
-        // Buscar el usuario autenticado
         User authenticatedUser = userRepository.findUserById(authenticatedId)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
-        // Buscar todos los ingresos de este usuario
         return incomeRepository.findByUser(authenticatedUser);
+    }
+
+    private void validateIdFormat(String id) {
+        if (profile.equals("postgres")) {
+            try {
+                Long.parseLong(id);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Invalid id format for Postgres: " + id);
+            }
+        }
     }
 }

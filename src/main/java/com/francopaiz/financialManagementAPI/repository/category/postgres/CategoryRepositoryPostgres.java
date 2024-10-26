@@ -18,17 +18,17 @@ import java.util.stream.Collectors;
  * con las categorías en una base de datos PostgreSQL.
  */
 @Profile("postgres") // Activa esta implementación cuando el perfil 'postgres' está activo.
-@RequiredArgsConstructor
 @Repository // Indica que esta clase es un repositorio de acceso a datos.
+@RequiredArgsConstructor
 public class CategoryRepositoryPostgres implements CategoryRepository {
 
     private final CategoryRepositoryJpa categoryRepositoryJpa; // Repositorio JPA para operaciones CRUD.
     private final CategoryCaster categoryCaster; // Utilidad para convertir entre entidades.
 
-    public CategoryRepositoryPostgres(CategoryRepositoryJpa categoryRepositoryJpa, CategoryCaster categoryCaster) {
+    /*public CategoryRepositoryPostgres(CategoryRepositoryJpa categoryRepositoryJpa, CategoryCaster categoryCaster) {
         this.categoryRepositoryJpa = categoryRepositoryJpa;
         this.categoryCaster = categoryCaster;
-    }
+    }*/
 
     /**
      * Crea una nueva categoría en la base de datos.

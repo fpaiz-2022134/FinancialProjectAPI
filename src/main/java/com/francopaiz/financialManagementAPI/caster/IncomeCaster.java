@@ -1,8 +1,10 @@
 package com.francopaiz.financialManagementAPI.caster;
 
 import com.francopaiz.financialManagementAPI.model.Income;
+import com.francopaiz.financialManagementAPI.model.User;
 import com.francopaiz.financialManagementAPI.model.mongo.IncomeMongo;
 import com.francopaiz.financialManagementAPI.model.postgres.IncomePostgres;
+import com.francopaiz.financialManagementAPI.model.postgres.UserPostgres; // Asegúrate de importar UserPostgres
 import org.springframework.stereotype.Component;
 
 /**
@@ -56,7 +58,14 @@ public class IncomeCaster {
         incomePostgres.setSource(income.getSource());
         incomePostgres.setAmount(income.getAmount());
         incomePostgres.setDate(income.getDate());
-        incomePostgres.setUser(income.getUser());
+
+        // Convertir User a UserPostgres
+        if (income.getUser() != null) {
+            UserCaster userCaster = new UserCaster();
+            UserPostgres userPostgres = userCaster.userToUserPostgres(income.getUser());
+            incomePostgres.setUser(userPostgres);
+        }
+
         return incomePostgres;
     }
 
@@ -72,7 +81,14 @@ public class IncomeCaster {
         income.setSource(incomePostgres.getSource());
         income.setAmount(incomePostgres.getAmount());
         income.setDate(incomePostgres.getDate());
-        income.setUser(incomePostgres.getUser());
+
+        // Convertir UserPostgres a User
+        if (incomePostgres.getUser() != null) {
+            UserCaster userCaster = new UserCaster();
+            User user = userCaster.userPostgresToUser(incomePostgres.getUser());
+            income.setUser(user);
+        }
+
         return income;
     }
 
@@ -88,7 +104,14 @@ public class IncomeCaster {
         incomePostgres.setSource(incomeMongo.getSource());
         incomePostgres.setAmount(incomeMongo.getAmount());
         incomePostgres.setDate(incomeMongo.getDate());
-        incomePostgres.setUser(incomeMongo.getUser());
+
+        // Convertir User a UserPostgres
+        if (incomeMongo.getUser() != null) {
+            UserCaster userCaster = new UserCaster();
+            UserPostgres userPostgres = userCaster.userToUserPostgres(incomeMongo.getUser());
+            incomePostgres.setUser(userPostgres);
+        }
+
         return incomePostgres;
     }
 
@@ -104,7 +127,14 @@ public class IncomeCaster {
         incomeMongo.setSource(incomePostgres.getSource());
         incomeMongo.setAmount(incomePostgres.getAmount());
         incomeMongo.setDate(incomePostgres.getDate());
-        incomeMongo.setUser(incomePostgres.getUser());
+
+        // Convertir UserPostgres a User
+        if (incomePostgres.getUser() != null) {
+            UserCaster userCaster = new UserCaster();
+            User user = userCaster.userPostgresToUser(incomePostgres.getUser());
+            incomeMongo.setUser(user);
+        }
+
         return incomeMongo;
     }
 }

@@ -28,6 +28,7 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
+			<version>42.7.2</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
@@ -69,6 +70,13 @@
 			<scope>runtime</scope>
 		</dependency>
 	</dependencies>
+
+	<!--<repositories>
+		<repository>
+			<id>central</id>
+			<url>https://repo.maven.apache.org/maven2</url>
+		</repository>
+	</repositories>-->
 	<build>
 		<plugins>
 			<plugin>

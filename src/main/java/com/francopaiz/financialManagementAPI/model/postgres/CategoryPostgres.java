@@ -7,8 +7,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 
-@AllArgsConstructor
-@NoArgsConstructor
+/*@AllArgsConstructor
+@NoArgsConstructor*/
 @Getter
 @Setter
 @Data

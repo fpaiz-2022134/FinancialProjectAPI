@@ -21,16 +21,17 @@ import java.util.stream.Collectors;
  */
 @Profile("postgres") // Activa esta implementación cuando el perfil 'postgres' está activo.
 @Repository // Indica que esta clase es un repositorio de acceso a datos.
+@RequiredArgsConstructor
 public class IncomeRepositoryPostgres implements IncomeRepository {
 
     private final IncomeRepositoryJpa incomeRepositoryJpa; // Repositorio JPA para operaciones CRUD.
     private final IncomeCaster incomeCaster; // Utilidad para convertir entre entidades.
 
-    public IncomeRepositoryPostgres(IncomeRepositoryJpa incomeRepositoryJpa, IncomeCaster incomeCaster) {
+    /*public IncomeRepositoryPostgres(IncomeRepositoryJpa incomeRepositoryJpa, IncomeCaster incomeCaster) {
         this.incomeRepositoryJpa = incomeRepositoryJpa;
         this.incomeCaster = incomeCaster;
     }
-
+*/
     /**
      * Crea un nuevo ingreso en la base de datos.
      *

@@ -32,69 +32,27 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse saveUser(User user) {
-        // Guardar el objeto User en el repositorio
         User savedUser = userRepository.createUser(user);
-
-        // Convertir el User guardado en un UserResponse y devolverlo
         return userCaster.userToUserResponse(savedUser);
     }
 
-    /**
-     * Obtiene una lista de todos los usuarios disponibles en el sistema.
-     *
-     * @return Una lista de objetos UserResponse que representan a los usuarios.
-     */
     @Override
     public List<UserResponse> getUsers() {
         List<User> users = userRepository.getUsers();
         return users.stream().map(userCaster::userToUserResponse).collect(Collectors.toList());
     }
 
-    /**
-     * Busca un usuario por su identificador único.
-     *
-     * @param idUser El identificador del usuario a buscar.
-     * @return El objeto UserResponse correspondiente al identificador proporcionado.
-     * @throws IllegalArgumentException si el formato del idUser es inválido para el perfil de PostgreSQL.
-     * @throws EntityNotFoundException si no se encuentra el usuario.
-     */
     @Override
     public UserResponse findUserById(String idUser) {
-        if (profile.equals("postgres")) {
-            try {
-                Long id = Long.parseLong(idUser);
-            } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("Invalid idUser format for Postgres: " + idUser);
-            }
-        }
+        validateIdFormat(idUser); // Verifica el formato del ID
         User user = userRepository.findUserById(idUser)
                 .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND + idUser));
         return userCaster.userToUserResponse(user);
     }
 
     @Override
-    public User findById(String idUser) {
-        return null;
-    }
-
-    /**
-     * Actualiza la información de un usuario existente en el sistema.
-     *
-     * @param idUser El identificador del usuario a actualizar.
-     * @param userRequestUpdate El objeto UserRequestUpdate que contiene los nuevos datos del usuario.
-     * @return El objeto UserResponse actualizado.
-     * @throws IllegalArgumentException si el formato del idUser es inválido para el perfil de PostgreSQL.
-     * @throws EntityNotFoundException si no se encuentra el usuario.
-     */
-    @Override
     public UserResponse updateUser(String idUser, UserRequestUpdate userRequestUpdate) {
-        if (profile.equals("postgres")) {
-            try {
-                Long id = Long.parseLong(idUser);
-            } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("Invalid idUser format for Postgres: " + idUser);
-            }
-        }
+        validateIdFormat(idUser); // Verifica el formato del ID
         User user = userRepository.findUserById(idUser)
                 .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND + idUser));
         user.setName(userRequestUpdate.getName());
@@ -103,24 +61,21 @@ public class UserServiceImpl implements UserService {
         return userCaster.userToUserResponse(update);
     }
 
-    /**
-     * Elimina un usuario del sistema por su identificador único.
-     *
-     * @param idUser El identificador del usuario a eliminar.
-     * @throws IllegalArgumentException si el formato del idUser es inválido para el perfil de PostgreSQL.
-     * @throws EntityNotFoundException si no se encuentra el usuario.
-     */
     @Override
     public void deleteUser(String idUser) {
+        validateIdFormat(idUser); // Verifica el formato del ID
+        userRepository.findUserById(idUser)
+                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND + idUser));
+        userRepository.deleteUser(idUser);
+    }
+
+    private void validateIdFormat(String idUser) {
         if (profile.equals("postgres")) {
             try {
-                Long id = Long.parseLong(idUser);
+                Long.parseLong(idUser);
             } catch (NumberFormatException e) {
                 throw new IllegalArgumentException("Invalid idUser format for Postgres: " + idUser);
             }
         }
-        userRepository.findUserById(idUser)
-                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND + idUser));
-        userRepository.deleteUser(idUser);
     }
 }

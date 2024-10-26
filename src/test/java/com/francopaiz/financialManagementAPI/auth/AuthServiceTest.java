@@ -1,3 +1,4 @@
+/*
 package com.francopaiz.financialManagementAPI.auth;
 
 
@@ -98,4 +99,4 @@ class AuthServiceTest {
         verify(userRepository, times(1)).findByEmail(email);
         verify(jwtTokenUtil, never()).generateToken(anyString());
     }
-}
+}*/

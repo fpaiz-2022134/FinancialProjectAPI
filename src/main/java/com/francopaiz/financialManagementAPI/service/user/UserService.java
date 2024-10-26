@@ -41,7 +41,7 @@ public interface UserService {
      * @param idUser El identificador del usuario a buscar.
      * @return El objeto UserResponse correspondiente al identificador proporcionado.
      */
-    User findById(String idUser);
+   /* User findById(String idUser);*/
     /**
      * Actualiza la información de un usuario existente en el sistema.
      *

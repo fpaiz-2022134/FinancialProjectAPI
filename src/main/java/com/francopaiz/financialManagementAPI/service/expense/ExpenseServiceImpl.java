@@ -1,12 +1,11 @@
 package com.francopaiz.financialManagementAPI.service.expense;
 
 import com.francopaiz.financialManagementAPI.model.Expense;
-import com.francopaiz.financialManagementAPI.model.Income;
 import com.francopaiz.financialManagementAPI.model.User;
 import com.francopaiz.financialManagementAPI.repository.expense.ExpenseRepository;
 import com.francopaiz.financialManagementAPI.repository.usuario.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.aggregation.ArithmeticOperators;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -23,6 +22,9 @@ public class ExpenseServiceImpl implements ExpenseService {
     @Autowired
     private UserRepository userRepository;
 
+    @Value("${spring.profiles.active}")
+    private String profile;
+
     @Override
     public List<Expense> getExpenses() {
         return expenseRepository.getExpenses();
@@ -30,6 +32,8 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public Expense findExpenseById(String id) {
+        // Validar el formato del ID antes de buscar el gasto.
+        validateIdFormat(id);
         return expenseRepository.findExpenseById(id).orElse(null);
     }
 
@@ -42,7 +46,7 @@ public class ExpenseServiceImpl implements ExpenseService {
         User authenticatedUser = userRepository.findUserById(authenticatedId)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
-        // Asignar el usuario autenticado al ingreso
+        // Asignar el usuario autenticado al gasto
         expense.setUser(authenticatedUser);
 
         if (expense.getDate() == null) {
@@ -54,36 +58,40 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public Expense updateExpense(String id, Expense expense) {
+        // Validar el formato del ID antes de actualizar el gasto.
+        validateIdFormat(id);
 
-        Expense existingExpense = expenseRepository.findExpenseById(id).orElseThrow(()-> new IllegalArgumentException("Gasto no encontrado"));
+        Expense existingExpense = expenseRepository.findExpenseById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Gasto no encontrado"));
 
-        if(expense.getDescription()!= null){
+        if (expense.getDescription() != null) {
             existingExpense.setDescription(expense.getDescription());
         }
 
-        if(expense.getAmount()!= null){
+        if (expense.getAmount() != null) {
             existingExpense.setAmount(expense.getAmount());
         }
 
-        if (expense.getDate()!= null){
+        if (expense.getDate() != null) {
             existingExpense.setDate(expense.getDate());
         }
 
-        if (expense.getUser()!= null){
+        if (expense.getUser() != null) {
             existingExpense.setUser(expense.getUser());
         }
 
-        if(expense.getCategory()!= null){
+        if (expense.getCategory() != null) {
             existingExpense.setCategory(expense.getCategory());
         }
-
 
         return expenseRepository.updateExpense(existingExpense);
     }
 
     @Override
     public void deleteExpense(String id) {
-         expenseRepository.deleteExpense(id);
+        // Validar el formato del ID antes de eliminar el gasto.
+        validateIdFormat(id);
+        expenseRepository.deleteExpense(id);
     }
 
     @Override
@@ -100,8 +108,22 @@ public class ExpenseServiceImpl implements ExpenseService {
         User authenticatedUser = userRepository.findUserById(authenticatedId)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
-        // Buscar todos los ingresos de este usuario
+        // Buscar todos los gastos de este usuario
         return expenseRepository.findByUser(authenticatedUser);
     }
 
+    /**
+     * Valida el formato del ID de gasto para PostgreSQL.
+     *
+     * @param id ID del gasto a validar.
+     */
+    private void validateIdFormat(String id) {
+        if (profile.equals("postgres")) {
+            try {
+                Long.parseLong(id);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Formato de ID no válido para PostgreSQL: " + id);
+            }
+        }
+    }
 }

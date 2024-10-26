@@ -21,15 +21,16 @@ import java.util.stream.Collectors;
  */
 @Profile("postgres") // Activa esta implementación cuando el perfil 'postgres' está activo.
 @Repository // Indica que esta clase es un repositorio de acceso a datos.
+@RequiredArgsConstructor
 public class ExpenseRepositoryPostgres implements ExpenseRepository {
 
     private final ExpenseRepositoryJpa expenseRepositoryJpa; // Repositorio JPA para operaciones CRUD.
     private final ExpenseCaster expenseCaster; // Utilidad para convertir entre entidades.
 
-    public ExpenseRepositoryPostgres(ExpenseRepositoryJpa expenseRepositoryJpa, ExpenseCaster expenseCaster) {
+   /* public ExpenseRepositoryPostgres(ExpenseRepositoryJpa expenseRepositoryJpa, ExpenseCaster expenseCaster) {
         this.expenseRepositoryJpa = expenseRepositoryJpa;
         this.expenseCaster = expenseCaster;
-    }
+    }*/
 
     /**
      * Crea un nuevo gasto en la base de datos.
