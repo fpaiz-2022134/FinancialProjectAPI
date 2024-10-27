@@ -5,7 +5,6 @@ import com.francopaiz.financialManagementAPI.model.mongo.UserMongo;
 import com.francopaiz.financialManagementAPI.repository.usuario.UserRepository;
 import lombok.RequiredArgsConstructor;
 import com.francopaiz.financialManagementAPI.model.User;
-
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
@@ -93,10 +92,20 @@ public class UserRepositoryMongo implements UserRepository {
      * @return Un Optional que puede contener el usuario si se encuentra, o vacío si no.
      */
     @Override
-    public Optional<User> findByEmail(String email) {
+    public Optional<User> findUserByEmail(String email) {
         Optional<UserMongo> userMongo = userRepositoryNoSql.findByEmail(email); // Buscar en la base de datos
         return userMongo.map(userCaster::userMongoToUser); // Convertir si se encuentra
     }
 
-
+    /**
+     * Busca un usuario por su nombre de usuario.
+     *
+     * @param username El nombre de usuario a buscar.
+     * @return Un Optional que puede contener el usuario si se encuentra, o vacío si no.
+     */
+    @Override
+    public Optional<User> findUserByUsername(String username) {
+        Optional<UserMongo> userMongo = userRepositoryNoSql.findByUsername(username); // Buscar en la base de datos
+        return userMongo.map(userCaster::userMongoToUser); // Convertir si se encuentra
+    }
 }

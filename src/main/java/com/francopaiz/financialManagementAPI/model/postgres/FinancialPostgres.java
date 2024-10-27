@@ -41,14 +41,5 @@ public class FinancialPostgres {
     private Map<Category, BigDecimal> expensesByCategory;
 
 
-    public FinancialPostgres() {
-    }
-
-    public FinancialPostgres(BigDecimal totalExpenses, BigDecimal totalIncome, BigDecimal balance, Map<Category, BigDecimal> expensesByCategory) {
-        this.totalExpenses = totalExpenses;
-        this.totalIncome = totalIncome;
-        this.balance = balance;
-        this.expensesByCategory = expensesByCategory;
-    }
 
 }

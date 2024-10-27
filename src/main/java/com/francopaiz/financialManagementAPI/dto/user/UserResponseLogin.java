@@ -1,5 +1,13 @@
 package com.francopaiz.financialManagementAPI.dto.user;
 
+
+import lombok.Data;
+
+/**
+ * DTO (Data Transfer Object) para la respuesta de inicio de sesión de un usuario.
+ * Esta clase representa la estructura de los datos que se envían al cliente al autenticar a un usuario en el sistema.
+ */
+@Data
 public class UserResponseLogin {
 
     /**

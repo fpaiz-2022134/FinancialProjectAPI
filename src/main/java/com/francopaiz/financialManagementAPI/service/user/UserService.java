@@ -3,7 +3,6 @@ package com.francopaiz.financialManagementAPI.service.user;
 import com.francopaiz.financialManagementAPI.dto.user.UserRequestUpdate;
 import com.francopaiz.financialManagementAPI.dto.user.UserResponse;
 import com.francopaiz.financialManagementAPI.model.User;
-
 import java.util.List;
 
 /**
@@ -11,14 +10,6 @@ import java.util.List;
  * Proporciona métodos para obtener, actualizar y eliminar usuarios.
  */
 public interface UserService {
-
-    /**
-     * Guarda un nuevo usuario en el sistema.
-     *
-     * @param user El objeto User que se va a guardar.
-     * @return El objeto UserResponse que representa al usuario guardado.
-     */
-    UserResponse saveUser(User user);
 
     /**
      * Obtiene una lista de todos los usuarios disponibles en el sistema.
@@ -35,13 +26,6 @@ public interface UserService {
      */
     UserResponse findUserById(String idUser);
 
-    /**
-     * Busca un usuario por su identificador único.
-     *
-     * @param idUser El identificador del usuario a buscar.
-     * @return El objeto UserResponse correspondiente al identificador proporcionado.
-     */
-   /* User findById(String idUser);*/
     /**
      * Actualiza la información de un usuario existente en el sistema.
      *

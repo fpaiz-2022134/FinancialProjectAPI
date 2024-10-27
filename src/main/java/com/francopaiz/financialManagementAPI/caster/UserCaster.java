@@ -1,17 +1,75 @@
 package com.francopaiz.financialManagementAPI.caster;
 
 import com.francopaiz.financialManagementAPI.dto.user.UserResponse;
+import com.francopaiz.financialManagementAPI.model.Role;
 import com.francopaiz.financialManagementAPI.model.User;
+import com.francopaiz.financialManagementAPI.model.mongo.RoleMongo;
 import com.francopaiz.financialManagementAPI.model.mongo.UserMongo;
+import com.francopaiz.financialManagementAPI.model.postgres.RolePostgres;
 import com.francopaiz.financialManagementAPI.model.postgres.UserPostgres;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Component;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Clase utilitaria para realizar conversiones entre diferentes representaciones
- * de usuarios, específicamente entre User, UserMongo y UserPostgres.
+ * de un usuario, específicamente entre las entidades User, UserPostgres, UserMongo y UserResponse.
  */
+@RequiredArgsConstructor
+
 @Component
 public class UserCaster {
+
+    private final RoleCaster roleCaster;
+    private final UserCaster userCaster;
+
+    /**
+     * Convierte un objeto User a un objeto UserPostgres.
+     *
+     * @param user El objeto User que se va a convertir.
+     * @return Un objeto UserPostgres que representa el usuario.
+     */
+    public UserPostgres userToUserPostgres(User user) {
+        UserPostgres userPostgres = new UserPostgres();
+        userPostgres.setId((user.getId() != null && !user.getId().isEmpty())
+                ? Long.parseLong(user.getId()) : null);
+        userPostgres.setName(user.getName());
+        userPostgres.setUsername(user.getUsername());
+        userPostgres.setEmail(user.getEmail());
+        userPostgres.setPassword(user.getPassword());
+        userPostgres.setDateCreation(user.getDateCreation());
+        userPostgres.setDateUpdate(user.getDateUpdate());
+        Set<RolePostgres> rolesPostgres = user.getRoles().stream()
+                .map(roleCaster::roleToRolePostgres)
+                .collect(Collectors.toSet());
+        userPostgres.setRoles(rolesPostgres);
+        return userPostgres;
+    }
+
+    /**
+     * Convierte un objeto UserPostgres a un objeto User.
+     *
+     * @param userPostgres El objeto UserPostgres que se va a convertir.
+     * @return Un objeto User que representa el usuario.
+     */
+    public User userPostgresToUser(UserPostgres userPostgres) {
+        User user = new User();
+        user.setId(String.valueOf(userPostgres.getId()));
+        user.setName(userPostgres.getName());
+        user.setUsername(userPostgres.getUsername());
+        user.setEmail(userPostgres.getEmail());
+        user.setPassword(userPostgres.getPassword());
+        user.setDateCreation(userPostgres.getDateCreation());
+        user.setDateUpdate(userPostgres.getDateUpdate());
+        Set<Role> roles = userPostgres.getRoles().stream()
+                .map(roleCaster::rolePostgresToRole)
+                .collect(Collectors.toSet());
+        user.setRoles(roles);
+        return user;
+    }
 
     /**
      * Convierte un objeto User a un objeto UserMongo.
@@ -23,9 +81,15 @@ public class UserCaster {
         UserMongo userMongo = new UserMongo();
         userMongo.setId(user.getId());
         userMongo.setName(user.getName());
+        userMongo.setUsername(user.getUsername());
         userMongo.setEmail(user.getEmail());
-        userMongo.setPassword(user.getPassword()); // Se codificará en el setter
-        userMongo.setPhone(user.getPhone());
+        userMongo.setPassword(user.getPassword());
+        userMongo.setDateCreation(user.getDateCreation());
+        userMongo.setDateUpdate(user.getDateUpdate());
+        Set<RoleMongo> roles = user.getRoles().stream()
+                .map(roleCaster::roleToRoleMongo)
+                .collect(Collectors.toSet());
+        userMongo.setRoles(roles);
         return userMongo;
     }
 
@@ -39,74 +103,16 @@ public class UserCaster {
         User user = new User();
         user.setId(userMongo.getId());
         user.setName(userMongo.getName());
+        user.setUsername(userMongo.getUsername());
         user.setEmail(userMongo.getEmail());
-        user.setPassword(userMongo.getPassword()); // Se mantendrá codificada
-        user.setPhone(userMongo.getPhone());
+        user.setPassword(userMongo.getPassword());
+        user.setDateCreation(userMongo.getDateCreation());
+        user.setDateUpdate(userMongo.getDateUpdate());
+        Set<Role> roles = userMongo.getRoles().stream()
+                .map(roleCaster::roleMongoToRole)
+                .collect(Collectors.toSet());
+        user.setRoles(roles);
         return user;
-    }
-
-    /**
-     * Convierte un objeto User a un objeto UserPostgres.
-     *
-     * @param user El objeto User que se va a convertir.
-     * @return Un objeto UserPostgres que representa el usuario.
-     */
-    public UserPostgres userToUserPostgres(User user) {
-        UserPostgres userPostgres = new UserPostgres();
-        userPostgres.setId(Long.valueOf(user.getId())); // Asegúrate de manejar la conversión del ID correctamente
-        userPostgres.setName(user.getName());
-        userPostgres.setEmail(user.getEmail());
-        userPostgres.setPassword(user.getPassword()); // Se codificará en el setter
-        userPostgres.setPhone(user.getPhone());
-        return userPostgres;
-    }
-
-    /**
-     * Convierte un objeto UserPostgres a un objeto User.
-     *
-     * @param userPostgres El objeto UserPostgres que se va a convertir.
-     * @return Un objeto User que representa el usuario.
-     */
-    public User userPostgresToUser(UserPostgres userPostgres) {
-        User user = new User();
-        user.setId(String.valueOf(userPostgres.getId())); // Asegúrate de manejar la conversión del ID correctamente
-        user.setName(userPostgres.getName());
-        user.setEmail(userPostgres.getEmail());
-        user.setPassword(userPostgres.getPassword()); // Se mantendrá codificada
-        user.setPhone(userPostgres.getPhone());
-        return user;
-    }
-
-    /**
-     * Convierte un objeto UserMongo a un objeto UserPostgres.
-     *
-     * @param userMongo El objeto UserMongo que se va a convertir.
-     * @return Un objeto UserPostgres que representa el usuario.
-     */
-    public UserPostgres userMongoToUserPostgres(UserMongo userMongo) {
-        UserPostgres userPostgres = new UserPostgres();
-        userPostgres.setId(Long.valueOf(userMongo.getId())); // Asegúrate de manejar la conversión del ID correctamente
-        userPostgres.setName(userMongo.getName());
-        userPostgres.setEmail(userMongo.getEmail());
-        userPostgres.setPassword(userMongo.getPassword()); // Se mantendrá codificada
-        userPostgres.setPhone(userMongo.getPhone());
-        return userPostgres;
-    }
-
-    /**
-     * Convierte un objeto UserPostgres a un objeto UserMongo.
-     *
-     * @param userPostgres El objeto UserPostgres que se va a convertir.
-     * @return Un objeto UserMongo que representa el usuario.
-     */
-    public UserMongo userPostgresToUserMongo(UserPostgres userPostgres) {
-        UserMongo userMongo = new UserMongo();
-        userMongo.setId(String.valueOf(userPostgres.getId())); // Asegúrate de manejar la conversión del ID correctamente
-        userMongo.setName(userPostgres.getName());
-        userMongo.setEmail(userPostgres.getEmail());
-        userMongo.setPassword(userPostgres.getPassword()); // Se mantendrá codificada
-        userMongo.setPhone(userPostgres.getPhone());
-        return userMongo;
     }
 
     /**
@@ -119,7 +125,10 @@ public class UserCaster {
         UserResponse userResponse = new UserResponse();
         userResponse.setId(user.getId());
         userResponse.setName(user.getName());
+        userResponse.setUsername(user.getUsername());
         userResponse.setEmail(user.getEmail());
+        userResponse.setDateCreation(user.getDateCreation());
+        userResponse.setDateUpdate(user.getDateUpdate());
         return userResponse;
     }
 
@@ -131,17 +140,14 @@ public class UserCaster {
      * @return Un objeto User que representa el usuario.
      */
     public User userResponseToUser(UserResponse userResponse) {
-        // Verifica que el objeto userResponse no sea nulo
-        if (userResponse == null) {
-            return null;  // O lanza una excepción, dependiendo de la lógica
-        }
-
-        // Crea un nuevo User y establece los valores
         User user = new User();
         user.setId(userResponse.getId());
         user.setName(userResponse.getName());
+        user.setUsername(userResponse.getUsername());
         user.setEmail(userResponse.getEmail());
-
+        user.setDateCreation(userResponse.getDateCreation());
+        user.setDateUpdate(userResponse.getDateUpdate());
+        // Los roles y password no se incluyen en UserResponse, por lo tanto, se omiten en esta conversión
         return user;
     }
 }

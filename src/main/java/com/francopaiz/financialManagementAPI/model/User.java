@@ -1,40 +1,59 @@
 package com.francopaiz.financialManagementAPI.model;
-
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-@Getter
-public class User {
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-    @Setter
-    @Id
-    private String id;
-    @Setter
-    private String name;
-    @Setter
-    private String email;
-    private String password;
-    @Setter
-    private String phone;
+/**
+ * Esta clase representa a un usuario en el sistema de biblioteca.
+ * Implementa la interfaz UserDetails para ser utilizada en el contexto de seguridad.
+ * La anotación @Data de Lombok genera automáticamente getters, setters, toString,
+ * equals, y hashCode.
+ */
+@Data
+public class User implements UserDetails {
 
-    public User() {
+    private String id; // Identificador único del usuario.
+    private String name; // Nombre completo del usuario.
+    private String username; // Nombre de usuario para el inicio de sesión.
+    private String email; // Dirección de correo electrónico del usuario.
+    private String password; // Contraseña cifrada del usuario.
+    private LocalDateTime dateCreation; // Fecha de creación de la cuenta del usuario.
+    private LocalDateTime dateUpdate; // Fecha de la última actualización de la cuenta.
+    private Set<Role> roles = new HashSet<>(); // Conjunto de roles asignados al usuario.
+
+    /**
+     * Obtiene los derechos de acceso del usuario.
+     *
+     * @return Colección de autoridades concedidas al usuario.
+     */
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(); // Debe implementarse para devolver las autoridades del usuario.
     }
 
-    public User(String id, String name, String email, String password, String phone) {
-        this.id = id;
-        this.name = name;
-        this.email = email;
-        this.password = new BCryptPasswordEncoder().encode(password);
-        this.phone = phone;
+    @Override
+    public boolean isAccountNonExpired() {
+        return UserDetails.super.isAccountNonExpired(); // Indica si la cuenta no ha expirado.
     }
 
-    public void setPassword(String password) {
-        // Aplicar cifrado de BCrypt siempre que se cambie la contraseña
-        this.password = new BCryptPasswordEncoder().encode(password);
+    @Override
+    public boolean isAccountNonLocked() {
+        return UserDetails.super.isAccountNonLocked(); // Indica si la cuenta no está bloqueada.
     }
 
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return UserDetails.super.isCredentialsNonExpired(); // Indica si las credenciales no han expirado.
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return UserDetails.super.isEnabled(); // Indica si la cuenta está habilitada.
+    }
 }

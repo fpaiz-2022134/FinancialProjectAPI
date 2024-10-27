@@ -8,20 +8,22 @@ import com.francopaiz.financialManagementAPI.model.postgres.CategoryPostgres;
 import com.francopaiz.financialManagementAPI.model.postgres.ExpensePostgres;
 import com.francopaiz.financialManagementAPI.model.postgres.UserPostgres;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-/**
- * Clase utilitaria para realizar conversiones entre diferentes representaciones
- * de un gasto, específicamente entre Expense, ExpensePostgres y ExpenseMongo.
- */
 @Component
 public class ExpenseCaster {
 
-    /**
-     * Convierte un objeto Expense a un objeto ExpensePostgres.
-     *
-     * @param expense El objeto Expense que se va a convertir.
-     * @return Un objeto ExpensePostgres que representa el gasto.
-     */
+    private final UserCaster userCaster;
+    private final CategoryCaster categoryCaster;
+
+    // Constructor que permite la inyección de dependencias
+    @Autowired
+    public ExpenseCaster(UserCaster userCaster, CategoryCaster categoryCaster) {
+        this.userCaster = userCaster;
+        this.categoryCaster = categoryCaster;
+    }
+
     public ExpensePostgres expenseToExpensePostgres(Expense expense) {
         ExpensePostgres expensePostgres = new ExpensePostgres();
 
@@ -31,16 +33,14 @@ public class ExpenseCaster {
         expensePostgres.setAmount(expense.getAmount());
         expensePostgres.setDate(expense.getDate());
 
-        // Convertir User a UserPostgres
+        // Usar la instancia inyectada de UserCaster
         if (expense.getUser() != null) {
-            UserCaster userCaster = new UserCaster();
             UserPostgres userPostgres = userCaster.userToUserPostgres(expense.getUser());
             expensePostgres.setUser(userPostgres);
         }
 
-        // Convertir Category a CategoryPostgres
+        // Usar la instancia inyectada de CategoryCaster
         if (expense.getCategory() != null) {
-            CategoryCaster categoryCaster = new CategoryCaster();
             CategoryPostgres categoryPostgres = categoryCaster.categoryToCategoryPostgres(expense.getCategory());
             expensePostgres.setCategory(categoryPostgres);
         }
@@ -60,19 +60,19 @@ public class ExpenseCaster {
         expense.setDescription(expensePostgres.getDescription());
         expense.setAmount(expensePostgres.getAmount());
         expense.setDate(expensePostgres.getDate());
-        // Convertir CategoryPostgres a Category
+
+        // Usar la instancia inyectada de CategoryCaster
         if (expensePostgres.getCategory() != null) {
-            CategoryCaster categoryCaster = new CategoryCaster();
             Category category = categoryCaster.categoryPostgresToCategory(expensePostgres.getCategory());
             expense.setCategory(category);
         }
 
-        // Convertir User a UserPostgres
-        if (expense.getUser() != null) {
-            UserCaster userCaster = new UserCaster();
-            User userPostgres = userCaster.userPostgresToUser(expensePostgres.getUser());
-            expense.setUser(userPostgres);
+        // Usar la instancia inyectada de UserCaster
+        if (expensePostgres.getUser() != null) {
+            User user = userCaster.userPostgresToUser(expensePostgres.getUser());
+            expense.setUser(user);
         }
+
         return expense;
     }
 

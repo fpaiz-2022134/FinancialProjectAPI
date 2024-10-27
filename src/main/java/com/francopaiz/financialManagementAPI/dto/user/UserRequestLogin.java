@@ -1,12 +1,19 @@
 package com.francopaiz.financialManagementAPI.dto.user;
 
+import lombok.Data;
+
+/**
+ * DTO (Data Transfer Object) para la solicitud de inicio de sesión de un usuario.
+ * Esta clase representa la estructura de los datos necesarios para autenticar a un usuario en el sistema.
+ */
+@Data
 public class UserRequestLogin {
 
     /**
-     * Email de usuario.
-     * Este campo se utiliza para almacenar el email de usuario que el usuario ingresará para iniciar sesión.
+     * Nombre de usuario.
+     * Este campo se utiliza para almacenar el nombre de usuario que el usuario ingresará para iniciar sesión.
      */
-    private String email;
+    private String username;
 
     /**
      * Contraseña del usuario.

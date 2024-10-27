@@ -1,7 +1,6 @@
 package com.francopaiz.financialManagementAPI.repository.usuario;
 
 import com.francopaiz.financialManagementAPI.model.User;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -29,10 +28,10 @@ public interface UserRepository {
     /**
      * Busca un usuario por su ID.
      *
-     * @param idUser El ID del usuario a buscar.
+     * @param id El ID del usuario a buscar.
      * @return Un Optional que contiene el usuario si se encuentra, o vacío si no.
      */
-    Optional<User> findUserById(String idUser);
+    Optional<User> findUserById(String id);
 
     /**
      * Actualiza un usuario existente en el repositorio.
@@ -45,15 +44,23 @@ public interface UserRepository {
     /**
      * Elimina un usuario del repositorio por su ID.
      *
-     * @param idUser El ID del usuario a eliminar.
+     * @param id El ID del usuario a eliminar.
      */
-    void deleteUser(String idUser);
+    void deleteUser(String id);
 
     /**
-     * Busca un usuario por su email.
+     * Busca un usuario por su correo electrónico.
      *
-     * @param email El email del usuario a buscar.
+     * @param email El correo electrónico del usuario a buscar.
      * @return Un Optional que contiene el usuario si se encuentra, o vacío si no.
      */
-    Optional<User> findByEmail(String email);
+    Optional<User> findUserByEmail(String email);
+
+    /**
+     * Busca un usuario por su nombre de usuario.
+     *
+     * @param username El nombre de usuario a buscar.
+     * @return Un Optional que contiene el usuario si se encuentra, o vacío si no.
+     */
+    Optional<User> findUserByUsername(String username);
 }

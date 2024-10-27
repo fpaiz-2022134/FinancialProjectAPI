@@ -1,13 +1,12 @@
 package com.francopaiz.financialManagementAPI.model;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-
-@Setter
-@Getter
+@Data
 public class Expense {
 
     private String id;
@@ -19,16 +18,6 @@ public class Expense {
     private User user;
 
 
-    public Expense() {
-    }
 
-    public Expense(String id, String description, BigDecimal amount, LocalDate date, Category category, User user) {
-        this.id = id;
-        this.description = description;
-        this.amount = amount;
-        this.date = date;
-        this.category = category;
-        this.user = user;
-    }
 
 }

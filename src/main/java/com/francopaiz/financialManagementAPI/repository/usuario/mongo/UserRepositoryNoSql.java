@@ -1,20 +1,31 @@
 package com.francopaiz.financialManagementAPI.repository.usuario.mongo;
 
-import com.francopaiz.financialManagementAPI.model.User;
+
 import com.francopaiz.financialManagementAPI.model.mongo.UserMongo;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository
+/**
+ * Interfaz del repositorio de usuarios para MongoDB.
+ * Extiende MongoRepository para proporcionar operaciones CRUD
+ * y consultas específicas para la entidad UserMongo.
+ */
 public interface UserRepositoryNoSql extends MongoRepository<UserMongo, String> {
 
     /**
-     * Busca un usuario por su email.
+     * Busca un usuario por su nombre de usuario.
      *
-     * @param email El email del usuario a buscar.
-     * @return Un Optional que contiene el usuario si se encuentra, o vacío si no.
+     * @param username El nombre de usuario a buscar.
+     * @return Un Optional que puede contener el usuario si se encuentra, o vacío si no.
+     */
+    Optional<UserMongo> findByUsername(String username);
+
+    /**
+     * Busca un usuario por su dirección de correo electrónico.
+     *
+     * @param email La dirección de correo electrónico del usuario a buscar.
+     * @return Un Optional que puede contener el usuario si se encuentra, o vacío si no.
      */
     Optional<UserMongo> findByEmail(String email);
 }
