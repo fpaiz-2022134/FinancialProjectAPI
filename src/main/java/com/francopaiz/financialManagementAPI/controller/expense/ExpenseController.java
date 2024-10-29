@@ -22,24 +22,35 @@ public class ExpenseController {
 
     @GetMapping
     public List<Expense> findAll(){
+
+        System.out.println("HOLA");
         return expenseService.getExpenses();
     }
 
     @GetMapping("/{idExpense}")
     public Expense findById(@PathVariable String idExpense){
+
+
         return expenseService.findExpenseById(idExpense);
     }
 
     @PostMapping("/{idCategory}")
     public Expense save (@PathVariable String idCategory, @RequestBody Expense expense){
-
+        System.out.println("holaaaaaaaaa");
         if (expense.getCategory() ==null){
             Category categoryFound = categoryService.findCategoryById(idCategory);
             System.out.println(categoryFound);
             expense.setCategory(categoryFound);
         }
 
-        return expenseService.createExpense(expense);
+
+        try {
+            return expenseService.createExpense(expense);
+        } catch (Exception e) {
+            e.printStackTrace(); // o usa un logger para registrar el error
+            throw new RuntimeException("Error al crear el gasto", e);
+
+        }
     }
 
     @PutMapping("/{idExpense}")

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -39,21 +40,28 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public Expense createExpense(Expense expense) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String authenticatedId = (String) authentication.getPrincipal();
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String idUser = ((User) userDetails).getId();
 
-        System.out.println("Id del autenticado: " + authenticatedId);
-        User authenticatedUser = userRepository.findUserById(authenticatedId)
+        System.out.println("Id del autenticado: " + idUser);
+        User authenticatedUser = userRepository.findUserById(idUser)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
         // Asignar el usuario autenticado al gasto
         expense.setUser(authenticatedUser);
+        System.out.println(authenticatedUser);
 
         if (expense.getDate() == null) {
             expense.setDate(LocalDate.now());
         }
 
-        return expenseRepository.createExpense(expense);
+        try {
+            return expenseRepository.createExpense(expense);
+        } catch (Exception e) {
+            e.printStackTrace(); // o usa un logger para registrar el error
+            throw new RuntimeException("Error al crear el gasto", e);
+
+        }
     }
 
     @Override

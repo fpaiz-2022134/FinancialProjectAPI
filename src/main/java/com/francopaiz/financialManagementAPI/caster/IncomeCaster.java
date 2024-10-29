@@ -40,7 +40,7 @@ public class IncomeCaster {
 
     public IncomePostgres incomeToIncomePostgres(Income income) {
         IncomePostgres incomePostgres = new IncomePostgres();
-        incomePostgres.setId(Long.valueOf(income.getId()));
+        /*incomePostgres.setId(Long.valueOf(income.getId()));*/
         incomePostgres.setSource(income.getSource());
         incomePostgres.setAmount(income.getAmount());
         incomePostgres.setDate(income.getDate());
@@ -55,7 +55,9 @@ public class IncomeCaster {
 
     public Income incomePostgresToIncome(IncomePostgres incomePostgres) {
         Income income = new Income();
-        income.setId(String.valueOf(incomePostgres.getId()));
+        if (income.getId() != null) {
+            incomePostgres.setId(Long.valueOf(income.getId()));
+        }
         income.setSource(incomePostgres.getSource());
         income.setAmount(incomePostgres.getAmount());
         income.setDate(incomePostgres.getDate());

@@ -19,6 +19,7 @@ public class ExpensePostgres{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="expense_id")
     private Long id;
 
 

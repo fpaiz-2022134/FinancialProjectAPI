@@ -41,6 +41,9 @@ public class IncomeRepositoryPostgres implements IncomeRepository {
     @Override
     public Income createIncome(Income income) {
         IncomePostgres incomePostgres = incomeCaster.incomeToIncomePostgres(income); // Convierte a IncomePostgres.
+
+        System.out.println("PRUEBAAAAAAAA" + incomePostgres);
+
         IncomePostgres newIncome = incomeRepositoryJpa.save(incomePostgres); // Guarda el ingreso en la base de datos.
         System.out.println("Nuevo INCOME: " + newIncome);
         return incomeCaster.incomePostgresToIncome(newIncome); // Convierte y retorna el ingreso creado.

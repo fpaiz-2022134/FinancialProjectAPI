@@ -17,6 +17,7 @@ public class IncomePostgres {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="id_income")
     private Long id;
 
 

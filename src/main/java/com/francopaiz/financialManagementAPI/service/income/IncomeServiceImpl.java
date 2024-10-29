@@ -47,19 +47,30 @@ public class IncomeServiceImpl implements IncomeService {
 
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String idUser = ((User) userDetails).getId();
+/*
         System.out.println(idUser);
+*/
 
         User authenticatedUser = userRepository.findUserById(idUser)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         System.out.println(authenticatedUser);
+
+
         income.setUser(authenticatedUser);
 
         if (income.getDate() == null) {
             income.setDate(LocalDate.now());
         }
 
-        System.out.println(income);
-        return incomeRepository.createIncome(income);
+       /* System.out.println(income.getUser());
+        System.out.println(incomeRepository.createIncome(income));*/
+        try {
+            return incomeRepository.createIncome(income);
+        } catch (Exception e) {
+            e.printStackTrace(); // o usa un logger para registrar el error
+            throw new RuntimeException("Error al crear el ingreso", e);
+
+        }
     }
 
     @Override

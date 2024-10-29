@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
 
-/*@EnableJpaRepositories(basePackages = "com.francopaiz.financialManagementAPI.repository.usuario.postgres")*/
 public class FinancialManagementApiApplication {
 
 	public static void main(String[] args) {

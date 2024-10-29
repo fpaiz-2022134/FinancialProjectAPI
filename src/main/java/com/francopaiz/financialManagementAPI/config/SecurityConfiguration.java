@@ -39,7 +39,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/v1/user/**").authenticated()
                         .requestMatchers("/api/v1/categories/**").authenticated()
                         .requestMatchers("/api/v1/incomes/**").authenticated()
-                        .requestMatchers("/api/v1/expenses/**").authenticated()
+                        .requestMatchers("/api/v1/expenses/**").permitAll()
                         .requestMatchers("/api/v1/summaries/**").authenticated()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
