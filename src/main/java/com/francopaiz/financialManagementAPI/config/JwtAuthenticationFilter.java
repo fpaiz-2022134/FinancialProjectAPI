@@ -36,7 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final HandlerExceptionResolver handlerExceptionResolver; // Manejo de excepciones de filtros.
     private final JwtService jwtService; // Servicio para manejar operaciones relacionadas con JWT.
 
-    @Lazy
+
     private final UserDetailsService userDetailsService; // Servicio para cargar detalles de usuarios.
 
     /**

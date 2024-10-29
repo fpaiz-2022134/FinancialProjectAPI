@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -39,18 +40,25 @@ public class IncomeServiceImpl implements IncomeService {
 
     @Override
     public Income createIncome(Income income) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+       /* Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String authenticatedId = (String) authentication.getPrincipal();
+        System.out.println(authenticatedId);*/
 
-        User authenticatedUser = userRepository.findUserById(authenticatedId)
+
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String idUser = ((User) userDetails).getId();
+        System.out.println(idUser);
+
+        User authenticatedUser = userRepository.findUserById(idUser)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
-
+        System.out.println(authenticatedUser);
         income.setUser(authenticatedUser);
 
         if (income.getDate() == null) {
             income.setDate(LocalDate.now());
         }
 
+        System.out.println(income);
         return incomeRepository.createIncome(income);
     }
 

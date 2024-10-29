@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 public class UserCaster {
 
     private final RoleCaster roleCaster;
-    private final UserCaster userCaster;
 
     /**
      * Convierte un objeto User a un objeto UserPostgres.

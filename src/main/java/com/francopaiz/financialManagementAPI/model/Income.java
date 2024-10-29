@@ -11,7 +11,6 @@ import java.time.LocalDate;
 
 @Data
 public class Income {
-    @Id
     private String id;
     private String source;
     private BigDecimal amount;

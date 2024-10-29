@@ -64,7 +64,7 @@ public class IncomeCaster {
             User user = userCaster.userPostgresToUser(incomePostgres.getUser());
             income.setUser(user);
         }
-
+        System.out.println("Conversión de incompostgres a income" + income.getUser());
         return income;
     }
 

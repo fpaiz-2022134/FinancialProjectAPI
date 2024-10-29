@@ -34,11 +34,12 @@ public class SecurityConfiguration {
         http
                 .csrf(AbstractHttpConfigurer::disable) // Desactiva la protección CSRF, ya que se utiliza JWT.
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth/**", "/").permitAll()  // Permitir acceso a /usuarios sin autenticación
-                        .requestMatchers("/api/v1/users/**").authenticated()
+                        .requestMatchers("/api/v1/auth/**", "/").permitAll()  // Permitir acceso a /usuarios sin autenticación
+                        .requestMatchers("/api/v1/role/**").permitAll()
+                        .requestMatchers("/api/v1/user/**").authenticated()
                         .requestMatchers("/api/v1/categories/**").authenticated()
                         .requestMatchers("/api/v1/incomes/**").authenticated()
-                        .requestMatchers("/api/v1t/expenses/**").authenticated()
+                        .requestMatchers("/api/v1/expenses/**").authenticated()
                         .requestMatchers("/api/v1/summaries/**").authenticated()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session

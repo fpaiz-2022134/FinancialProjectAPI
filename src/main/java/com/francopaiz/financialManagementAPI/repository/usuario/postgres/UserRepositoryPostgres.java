@@ -24,7 +24,6 @@ public class UserRepositoryPostgres implements UserRepository {
 
     private final UserRepositoryJpa userRepositoryJpa; // Repositorio JPA para operaciones CRUD en PostgreSQL
 
-    @Lazy
     private final UserCaster userCaster; // Clase para convertir entre User y UserPostgres
 
     /**
