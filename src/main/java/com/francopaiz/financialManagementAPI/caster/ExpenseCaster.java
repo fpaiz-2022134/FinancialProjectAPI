@@ -27,8 +27,7 @@ public class ExpenseCaster {
     public ExpensePostgres expenseToExpensePostgres(Expense expense) {
         ExpensePostgres expensePostgres = new ExpensePostgres();
 
-        /*expensePostgres.setId((expense.getId() != null && !expense.getId().isEmpty())
-                ? Long.parseLong(expense.getId()) : null);*/
+        expensePostgres.setId(Long.valueOf(expense.getId()));
         expensePostgres.setDescription(expense.getDescription());
         expensePostgres.setAmount(expense.getAmount());
         expensePostgres.setDate(expense.getDate());
@@ -56,7 +55,7 @@ public class ExpenseCaster {
      */
     public Expense expensePostgresToExpense(ExpensePostgres expensePostgres) {
         Expense expense = new Expense();
-        /*expense.setId(String.valueOf(expensePostgres.getId()));*/
+        expense.setId(String.valueOf(expensePostgres.getId()));
         expense.setDescription(expensePostgres.getDescription());
         expense.setAmount(expensePostgres.getAmount());
         expense.setDate(expensePostgres.getDate());

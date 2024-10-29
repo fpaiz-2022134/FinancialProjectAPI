@@ -70,6 +70,7 @@ public class IncomeRepositoryPostgres implements IncomeRepository {
     @Override
     public Optional<Income> findIncomeById(String idIncome) {
         Optional<IncomePostgres> incomePostgres = incomeRepositoryJpa.findById(Long.parseLong(idIncome)); // Busca el ingreso por ID.
+        System.out.println(incomePostgres);
         return incomePostgres.map(incomeCaster::incomePostgresToIncome); // Convierte el resultado a un Optional de Income.
     }
 
@@ -104,7 +105,7 @@ public class IncomeRepositoryPostgres implements IncomeRepository {
      */
     @Override
     public List<Income> findByUser(User user) {
-        return incomeRepositoryJpa.findByUser(user).stream() // Obtiene los ingresos del usuario.
+        return incomeRepositoryJpa.findByUser_Id(Long.valueOf(user.getId())).stream() // Obtiene los ingresos del usuario.
                 .map(incomeCaster::incomePostgresToIncome) // Convierte cada ingreso a Income.
                 .collect(Collectors.toList()); // Recoge los ingresos en una lista.
     }
@@ -119,7 +120,7 @@ public class IncomeRepositoryPostgres implements IncomeRepository {
      */
     @Override
     public List<Income> findByUserAndDateBetween(User user, LocalDate startDate, LocalDate endDate) {
-        return incomeRepositoryJpa.findByUserAndDateBetween(user, startDate, endDate).stream() // Obtiene los ingresos del usuario en el rango de fechas.
+        return incomeRepositoryJpa.findByUser_IdAndDateBetween(Long.valueOf(user.getId()), startDate, endDate).stream() // Obtiene los ingresos del usuario en el rango de fechas.
                 .map(incomeCaster::incomePostgresToIncome) // Convierte cada ingreso a Income.
                 .collect(Collectors.toList()); // Recoge los ingresos en una lista.
     }

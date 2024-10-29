@@ -112,13 +112,23 @@ public class IncomeServiceImpl implements IncomeService {
 
     @Override
     public List<Income> findIncomesForAuthenticatedUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String authenticatedId = (String) authentication.getPrincipal();
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String idUser = ((User) userDetails).getId();
+        System.out.println(idUser);
 
-        User authenticatedUser = userRepository.findUserById(authenticatedId)
+        User authenticatedUser = userRepository.findUserById(idUser)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
-        return incomeRepository.findByUser(authenticatedUser);
+        System.out.println(authenticatedUser);
+
+        System.out.println(incomeRepository.findByUser(authenticatedUser));
+        try{
+            return incomeRepository.findByUser(authenticatedUser);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error al encontrar el ingreso", e);
+        }
+
     }
 
     private void validateIdFormat(String id) {

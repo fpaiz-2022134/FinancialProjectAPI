@@ -100,7 +100,7 @@ public class ExpenseRepositoryPostgres implements ExpenseRepository {
      */
     @Override
     public List<Expense> findByUser(User user) {
-        return expenseRepositoryJpa.findByUser(user).stream() // Obtiene los gastos del usuario.
+        return expenseRepositoryJpa.findByUser_Id(Long.valueOf(user.getId())).stream() // Obtiene los gastos del usuario.
                 .map(expenseCaster::expensePostgresToExpense) // Convierte cada gasto a Expense.
                 .collect(Collectors.toList()); // Recoge los gastos en una lista.
     }
@@ -115,7 +115,7 @@ public class ExpenseRepositoryPostgres implements ExpenseRepository {
      */
     @Override
     public List<Expense> findByUserAndDateBetween(User user, LocalDate startDate, LocalDate endDate) {
-        return expenseRepositoryJpa.findByUserAndDateBetween(user, startDate, endDate).stream() // Obtiene los gastos del usuario en el rango de fechas.
+        return expenseRepositoryJpa.findByUser_IdAndDateBetween(Long.valueOf(user.getId()), startDate, endDate).stream() // Obtiene los gastos del usuario en el rango de fechas.
                 .map(expenseCaster::expensePostgresToExpense) // Convierte cada gasto a Expense.
                 .collect(Collectors.toList()); // Recoge los gastos en una lista.
     }

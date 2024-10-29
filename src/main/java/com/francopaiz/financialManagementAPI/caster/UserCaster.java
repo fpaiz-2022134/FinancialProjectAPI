@@ -146,6 +146,7 @@ public class UserCaster {
         user.setEmail(userResponse.getEmail());
         user.setDateCreation(userResponse.getDateCreation());
         user.setDateUpdate(userResponse.getDateUpdate());
+        System.out.println(user);
         // Los roles y password no se incluyen en UserResponse, por lo tanto, se omiten en esta conversión
         return user;
     }

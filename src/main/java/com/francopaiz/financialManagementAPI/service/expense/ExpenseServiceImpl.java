@@ -109,15 +109,26 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public List<Expense> findExpensesForAuthenticatedUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String authenticatedId = (String) authentication.getPrincipal();
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String idUser = ((User) userDetails).getId();
+
+        System.out.println(idUser);
 
         // Buscar el usuario autenticado
-        User authenticatedUser = userRepository.findUserById(authenticatedId)
+        User authenticatedUser = (User) userRepository.findUserById(idUser)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
+        System.out.println(authenticatedUser);
         // Buscar todos los gastos de este usuario
-        return expenseRepository.findByUser(authenticatedUser);
+        System.out.println("hola 1");
+        System.out.println(expenseRepository.findByUser(authenticatedUser));
+        System.out.println("hola 2");
+        try{
+            return expenseRepository.findByUser(authenticatedUser);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error al encontrar el ingreso", e);
+        }
     }
 
     /**

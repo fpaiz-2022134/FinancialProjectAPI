@@ -9,6 +9,8 @@ import com.francopaiz.financialManagementAPI.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -23,18 +25,27 @@ public class FinanceController {
     @Autowired
     private UserService userService;
 
+    @Autowired
     UserCaster userCaster;
 
-    @GetMapping("/{userId}")
+    @GetMapping()
     public ResponseEntity<FinancialSummary> getFinancialSummary(
-            @PathVariable String userId,
+            /*@PathVariable String userId,*/
             @RequestParam("from") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam("to") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
 
-        UserResponse userFound = userService.findUserById(userId);
+       /* UserResponse userFound = userService.findUserById(userId);
+        System.out.println(userFound);*/
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String idUser = ((User) userDetails).getId();
+
+        System.out.println(idUser);
+
+        UserResponse userFound = userService.findUserById(idUser);
+        System.out.println(userFound);
 
         User userTransformed = userCaster.userResponseToUser(userFound);
-
+        System.out.println(userTransformed);
         FinancialSummary summary = financialService.generateSummary(userTransformed, from, to);
         return ResponseEntity.ok(summary);
     }

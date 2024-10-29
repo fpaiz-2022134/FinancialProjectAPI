@@ -20,18 +20,18 @@ public interface ExpenseRepositoryJpa extends JpaRepository<ExpensePostgres, Lon
     /**
      * Busca todos los gastos asociados a un usuario específico.
      *
-     * @param user El usuario cuyos gastos se van a buscar.
+     * @param userId El usuario cuyos gastos se van a buscar.
      * @return Una lista de objetos Expense que pertenecen al usuario.
      */
-    List<ExpensePostgres> findByUser(User user);
+    List<ExpensePostgres> findByUser_Id(Long userId);
 
     /**
      * Busca los gastos de un usuario dentro de un rango de fechas específico.
      *
-     * @param user El usuario cuyos gastos se van a buscar.
+     * @param userId El usuario cuyos gastos se van a buscar.
      * @param startDate La fecha de inicio del rango.
      * @param endDate La fecha de fin del rango.
      * @return Una lista de objetos Expense que pertenecen al usuario dentro del rango de fechas.
      */
-    List<ExpensePostgres> findByUserAndDateBetween(User user, LocalDate startDate, LocalDate endDate);
+    List<ExpensePostgres> findByUser_IdAndDateBetween(Long userId, LocalDate startDate, LocalDate endDate);
 }
