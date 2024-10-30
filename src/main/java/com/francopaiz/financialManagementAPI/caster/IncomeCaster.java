@@ -2,6 +2,7 @@ package com.francopaiz.financialManagementAPI.caster;
 import com.francopaiz.financialManagementAPI.model.Income;
 import com.francopaiz.financialManagementAPI.model.User;
 import com.francopaiz.financialManagementAPI.model.mongo.IncomeMongo;
+import com.francopaiz.financialManagementAPI.model.mongo.UserMongo;
 import com.francopaiz.financialManagementAPI.model.postgres.IncomePostgres;
 import com.francopaiz.financialManagementAPI.model.postgres.UserPostgres;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,15 @@ public class IncomeCaster {
         incomeMongo.setSource(income.getSource());
         incomeMongo.setAmount(income.getAmount());
         incomeMongo.setDate(income.getDate());
+
+        if (income.getUser() != null){
+            UserMongo userMongo = userCaster.userToUserMongo(income.getUser());
+            incomeMongo.setUser(userMongo);
+        }
+
+/*
         incomeMongo.setUser(income.getUser());
+*/
         return incomeMongo;
     }
 
@@ -34,7 +43,14 @@ public class IncomeCaster {
         income.setSource(incomeMongo.getSource());
         income.setAmount(incomeMongo.getAmount());
         income.setDate(incomeMongo.getDate());
+
+        if (incomeMongo.getUser() != null){
+            User user = userCaster.userMongoToUser(incomeMongo.getUser());
+            income.setUser(user);
+        }
+/*
         income.setUser(incomeMongo.getUser());
+*/
         return income;
     }
 
@@ -73,7 +89,7 @@ public class IncomeCaster {
         return income;
     }
 
-    public IncomePostgres incomeMongoToIncomePostgres(IncomeMongo incomeMongo) {
+    /*public IncomePostgres incomeMongoToIncomePostgres(IncomeMongo incomeMongo) {
         IncomePostgres incomePostgres = new IncomePostgres();
         incomePostgres.setId(Long.valueOf(incomeMongo.getId()));
         incomePostgres.setSource(incomeMongo.getSource());
@@ -101,5 +117,5 @@ public class IncomeCaster {
         }
 
         return incomeMongo;
-    }
+    }*/
 }

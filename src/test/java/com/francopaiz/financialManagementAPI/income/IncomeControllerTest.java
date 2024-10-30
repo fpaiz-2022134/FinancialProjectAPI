@@ -1,4 +1,4 @@
-/*
+
 package com.francopaiz.financialManagementAPI.income;
 
 import com.francopaiz.financialManagementAPI.controller.income.IncomeController;
@@ -43,7 +43,7 @@ class IncomeControllerTest {
     void testFindAll() {
         // Arrange
         List<Income> incomes = Arrays.asList(income);
-        when(incomeService.findAll()).thenReturn(incomes);
+        when(incomeService.getIncomes()).thenReturn(incomes);
 
         // Act
         List<Income> result = incomeController.findAll();
@@ -51,46 +51,46 @@ class IncomeControllerTest {
         // Assert
         assertEquals(1, result.size());
         assertEquals(BigDecimal.valueOf(200.00), result.get(0).getAmount());
-        verify(incomeService, times(1)).findAll();
+        verify(incomeService, times(1)).getIncomes() ;
     }
 
     @Test
     void testFindById() {
         // Arrange
-        when(incomeService.findById("1")).thenReturn(income);
+        when(incomeService.findIncomeById("1")).thenReturn(income);
 
         // Act
         Income result = incomeController.findById("1");
 
         // Assert
         assertEquals(BigDecimal.valueOf(200.00), result.getAmount());
-        verify(incomeService, times(1)).findById("1");
+        verify(incomeService, times(1)).findIncomeById( "1");
     }
 
     @Test
     void testSave() {
         // Arrange
-        when(incomeService.save(any(Income.class))).thenReturn(income);
+        when(incomeService.createIncome(any(Income.class))).thenReturn(income);
 
         // Act
         Income result = incomeController.save(income);
 
         // Assert
         assertEquals(BigDecimal.valueOf(200.00), result.getAmount());
-        verify(incomeService, times(1)).save(any(Income.class));
+        verify(incomeService, times(1)).createIncome(any(Income.class));
     }
 
     @Test
     void testUpdate() {
         // Arrange
-        when(incomeService.update(eq("1"), any(Income.class))).thenReturn(income);
+        when(incomeService.updateIncome(eq("1"), any(Income.class))).thenReturn(income);
 
         // Act
         Income result = incomeController.update("1", income);
 
         // Assert
         assertEquals(BigDecimal.valueOf(200.00), result.getAmount());
-        verify(incomeService, times(1)).update(eq("1"), any(Income.class));
+        verify(incomeService, times(1)).updateIncome(eq("1"), any(Income.class));
     }
 
     @Test
@@ -99,7 +99,7 @@ class IncomeControllerTest {
         incomeController.deleteById("1");
 
         // Assert
-        verify(incomeService, times(1)).deleteById("1");
+        verify(incomeService, times(1)).deleteIncome("1");
     }
 
     @Test
@@ -117,4 +117,4 @@ class IncomeControllerTest {
         verify(incomeService, times(1)).findIncomesForAuthenticatedUser();
     }
 }
-*/
+

@@ -1,9 +1,11 @@
 package com.francopaiz.financialManagementAPI.repository.income.mongo;
 
 import com.francopaiz.financialManagementAPI.caster.IncomeCaster;
+import com.francopaiz.financialManagementAPI.caster.UserCaster;
 import com.francopaiz.financialManagementAPI.model.Income;
 import com.francopaiz.financialManagementAPI.model.User;
 import com.francopaiz.financialManagementAPI.model.mongo.IncomeMongo;
+import com.francopaiz.financialManagementAPI.model.mongo.UserMongo;
 import com.francopaiz.financialManagementAPI.repository.income.IncomeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
@@ -26,7 +28,7 @@ public class IncomeRepositoryMongo implements IncomeRepository {
 
     private final IncomeRepositoryNoSql incomeRepositoryNoSql; // Repositorio NoSQL para operaciones CRUD.
     private final IncomeCaster incomeCaster; // Utilidad para convertir entre entidades.
-
+    private final UserCaster userCaster;
     /**
      * Crea un nuevo ingreso en la base de datos.
      *
@@ -95,7 +97,8 @@ public class IncomeRepositoryMongo implements IncomeRepository {
      */
     @Override
     public List<Income> findByUser(User user) {
-        return incomeRepositoryNoSql.findByUser(user).stream() // Obtiene los ingresos del usuario.
+        UserMongo userMongo = userCaster.userToUserMongo(user);
+        return incomeRepositoryNoSql.findByUser(userMongo).stream() // Obtiene los ingresos del usuario.
                 .map(incomeCaster::incomeMongoToIncome) // Convierte cada ingreso a Income.
                 .collect(Collectors.toList()); // Recoge los ingresos en una lista.
     }
@@ -110,7 +113,12 @@ public class IncomeRepositoryMongo implements IncomeRepository {
      */
     @Override
     public List<Income> findByUserAndDateBetween(User user, LocalDate startDate, LocalDate endDate) {
-        return incomeRepositoryNoSql.findByUserAndDateBetween(user, startDate, endDate).stream() // Obtiene los ingresos del usuario en el rango de fechas.
+
+        System.out.println("User que cae en income: " + user);
+        UserMongo userMongo = userCaster.userToUserMongo(user);
+        System.out.println(incomeRepositoryNoSql.findByUserAndDateBetween(userMongo, startDate, endDate));
+
+        return incomeRepositoryNoSql.findByUserAndDateBetween(userMongo, startDate, endDate).stream() // Obtiene los ingresos del usuario en el rango de fechas.
                 .map(incomeCaster::incomeMongoToIncome) // Convierte cada ingreso a Income.
                 .collect(Collectors.toList()); // Recoge los ingresos en una lista.
     }

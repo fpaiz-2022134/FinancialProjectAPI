@@ -1,17 +1,27 @@
-/*
 package com.francopaiz.financialManagementAPI.auth;
 
-
+import com.francopaiz.financialManagementAPI.dto.user.UserRequest;
+import com.francopaiz.financialManagementAPI.dto.user.UserRequestLogin;
+import com.francopaiz.financialManagementAPI.model.Role;
 import com.francopaiz.financialManagementAPI.model.User;
+import com.francopaiz.financialManagementAPI.repository.role.RoleRepository;
 import com.francopaiz.financialManagementAPI.repository.usuario.UserRepository;
-import com.francopaiz.financialManagementAPI.security.JwtTokenUtil;
-import com.francopaiz.financialManagementAPI.service.auth.AuthService;
+import com.francopaiz.financialManagementAPI.service.auth.AuthenticationService;
+import jakarta.persistence.EntityNotFoundException;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -22,81 +32,138 @@ class AuthServiceTest {
     private UserRepository userRepository;
 
     @Mock
-    private JwtTokenUtil jwtTokenUtil;
+    private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private AuthenticationManager authenticationManager;
+
+    @Mock
+    private RoleRepository roleRepository;
 
     @InjectMocks
-    private AuthService authService;
-
-    private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
-    private User user;
+    private AuthenticationService authenticationService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-
-
-        user = new User();
-        user.setId("1");
-        user.setName("John Doe");
-        user.setEmail("john.doe@example.com");
-        user.setPassword("password123");
-        user.setPhone("123456789");
     }
 
     @Test
-    void login_ValidCredentials_ShouldReturnJwtToken() {
+    void testSignup_Success() {
         // Arrange
-        String email = "john.doe@example.com";
-        String password = "password123";
-        String expectedToken = "mocked-jwt-token";
+        UserRequest userRequest = new UserRequest();
+        userRequest.setName("Test User");
+        userRequest.setUsername("testuser");
+        userRequest.setEmail("test@example.com");
+        userRequest.setPassword("password");
 
-        when(userRepository.findByEmail(email)).thenReturn(user);
-        when(jwtTokenUtil.generateToken(user.getId())).thenReturn(expectedToken);
+        Role role = new Role();
+        role.setRole("ROLE_USER");
+
+        when(passwordEncoder.encode(userRequest.getPassword())).thenReturn("encodedPassword");
+        when(roleRepository.findRoleByName("ROLE_USER")).thenReturn(Optional.of(role));
+
+        User user = new User();
+        user.setRoles(new HashSet<>()); // Inicializar el Set de roles
+        when(userRepository.createUser(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
-        String actualToken = authService.login(email, password);
+        User result = authenticationService.signup(userRequest);
 
         // Assert
-        assertNotNull(actualToken);
-        assertEquals(expectedToken, actualToken);
-        verify(userRepository, times(1)).findByEmail(email);
-        verify(jwtTokenUtil, times(1)).generateToken(user.getId());
+        assertNotNull(result);
+        assertEquals("Test User", result.getName());
+        assertEquals("testuser", result.getUsername());
+        assertEquals("test@example.com", result.getEmail());
+        assertEquals("encodedPassword", result.getPassword());
+        assertEquals(1, result.getRoles().size());
+        assertTrue(result.getRoles().contains(role)); // Verificar que el rol está presente
+        verify(userRepository, times(1)).createUser(any(User.class));
     }
 
     @Test
-    void login_InvalidCredentials_ShouldThrowException() {
+    void testSignup_RoleNotFound() {
         // Arrange
-        String email = "john.doe@example.com";
-        String wrongPassword = "wrongPassword";
+        UserRequest userRequest = new UserRequest();
+        userRequest.setName("Test User");
+        userRequest.setUsername("testuser");
+        userRequest.setEmail("test@example.com");
+        userRequest.setPassword("password");
 
-        when(userRepository.findByEmail(email)).thenReturn(user);
+        when(roleRepository.findRoleByName("ROLE_USER")).thenReturn(Optional.empty());
 
         // Act & Assert
-        Exception exception = assertThrows(RuntimeException.class, () -> {
-            authService.login(email, wrongPassword);
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
+            authenticationService.signup(userRequest);
         });
 
-        assertEquals("Invalid credentials", exception.getMessage());
-        verify(userRepository, times(1)).findByEmail(email);
-        verify(jwtTokenUtil, never()).generateToken(anyString());
+        assertEquals("error creating user, could not assign a role", exception.getMessage());
+        verify(userRepository, never()).createUser(any(User.class));
     }
 
     @Test
-    void login_NonExistentUser_ShouldThrowException() {
+    void testLogin_Success() {
         // Arrange
-        String email = "nonexistent@example.com";
-        String password = "password123";
+        UserRequestLogin userRequestLogin = new UserRequestLogin();
+        userRequestLogin.setUsername("testuser");
+        userRequestLogin.setPassword("password");
 
-        when(userRepository.findByEmail(email)).thenReturn(null);
+        User user = new User();
+        user.setUsername("testuser");
+        user.setPassword("encodedPassword");
+
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(null);
+        when(userRepository.findUserByUsername(userRequestLogin.getUsername())).thenReturn(Optional.of(user));
+
+        // Act
+        User result = authenticationService.login(userRequestLogin);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals("testuser", result.getUsername());
+        verify(userRepository, times(1)).findUserByUsername(userRequestLogin.getUsername());
+    }
+
+    @Test
+    void testLogin_UserNotFound() {
+        // Arrange
+        UserRequestLogin userRequestLogin = new UserRequestLogin();
+        userRequestLogin.setUsername("testuser");
+        userRequestLogin.setPassword("password");
+
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(null);
+        when(userRepository.findUserByUsername(userRequestLogin.getUsername())).thenReturn(Optional.empty());
 
         // Act & Assert
-        Exception exception = assertThrows(RuntimeException.class, () -> {
-            authService.login(email, password);
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
+            authenticationService.login(userRequestLogin);
         });
 
-        assertEquals("Invalid credentials", exception.getMessage());
-        verify(userRepository, times(1)).findByEmail(email);
-        verify(jwtTokenUtil, never()).generateToken(anyString());
+        assertEquals("error authenticating user, could not find user", exception.getMessage());
+        verify(userRepository, times(1)).findUserByUsername(userRequestLogin.getUsername());
     }
-}*/
+
+    @Test
+    void testGetRolesName_Success() {
+        // Arrange
+        User user = new User();
+        Role role1 = new Role();
+        role1.setRole("ROLE_USER");
+        Role role2 = new Role();
+        role2.setRole("ROLE_ADMIN");
+
+        Set<Role> roles = new HashSet<>();
+        roles.add(role1);
+        roles.add(role2);
+        user.setRoles(roles);
+
+        // Act
+        List<String> rolesNames = authenticationService.getRolesName(user);
+
+        // Assert
+        assertNotNull(rolesNames);
+        assertEquals(2, rolesNames.size());
+        assertTrue(rolesNames.contains("ROLE_USER"));
+        assertTrue(rolesNames.contains("ROLE_ADMIN"));
+    }
+}

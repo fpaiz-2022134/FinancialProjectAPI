@@ -1,105 +1,100 @@
-/*
 package com.francopaiz.financialManagementAPI.usuario;
 
+
 import com.francopaiz.financialManagementAPI.controller.usuario.UserController;
-import com.francopaiz.financialManagementAPI.model.User;
+import com.francopaiz.financialManagementAPI.dto.user.UserRequestUpdate;
+import com.francopaiz.financialManagementAPI.dto.user.UserResponse;
 import com.francopaiz.financialManagementAPI.service.user.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 class UserControllerTest {
 
-    @Mock
-    private UserService userService;
-
     @InjectMocks
     private UserController userController;
 
-    private User user;
+    @Mock
+    private UserService userService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-
-
-        user = new User();
-        user.setId("1");
-        user.setName("John Doe");
-        user.setEmail("john.doe@example.com");
     }
 
     @Test
-    void testFindAll() {
+    void testGetUsers() {
         // Arrange
-        List<User> users = Arrays.asList(user);
-        when(userService.findAll()).thenReturn(users);
+        UserResponse userResponse = new UserResponse();
+        when(userService.getUsers()).thenReturn(Collections.singletonList(userResponse));
 
         // Act
-        List<User> result = userController.findAll();
+        ResponseEntity<List<UserResponse>> response = userController.getUsers();
 
         // Assert
-        assertEquals(1, result.size());
-        assertEquals("John Doe", result.get(0).getName());
-        verify(userService, times(1)).findAll();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(1, response.getBody().size());
+        assertEquals(userResponse, response.getBody().get(0));
     }
 
     @Test
-    void testFindById() {
+    void testGetUser() {
         // Arrange
-        when(userService.findById("1")).thenReturn(user);
+        String userId = "123";
+        UserResponse userResponse = new UserResponse();
+        when(userService.findUserById(userId)).thenReturn(userResponse);
 
         // Act
-        User result = userController.findById("1");
+        ResponseEntity<UserResponse> response = userController.getUser(userId);
 
         // Assert
-        assertEquals("John Doe", result.getName());
-        verify(userService, times(1)).findById("1");
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(userResponse, response.getBody());
     }
 
     @Test
-    void testSave() {
+    void testUpdateUser() {
         // Arrange
-        when(userService.save(any(User.class))).thenReturn(user);
+        String userId = "123";
+        UserRequestUpdate userRequestUpdate = new UserRequestUpdate();
+        UserResponse updatedUserResponse = new UserResponse();
+        when(userService.updateUser(eq(userId), any(UserRequestUpdate.class))).thenReturn(updatedUserResponse);
 
         // Act
-        User result = userController.save(user);
+        ResponseEntity<UserResponse> response = userController.updateUser(userId, userRequestUpdate);
 
         // Assert
-        assertEquals("John Doe", result.getName());
-        verify(userService, times(1)).save(any(User.class));
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(updatedUserResponse, response.getBody());
     }
 
     @Test
-    void testUpdate() {
+    void testDeleteUser() {
         // Arrange
-        when(userService.update(eq("1"), any(User.class))).thenReturn(user);
+        String userId = "123";
 
         // Act
-        User result = userController.update("1", user);
+        ResponseEntity<Map<String, String>> response = userController.deleteUser(userId);
 
         // Assert
-        assertEquals("John Doe", result.getName());
-        verify(userService, times(1)).update(eq("1"), any(User.class));
-    }
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertTrue(response.getBody().containsKey("message"));
+        assertEquals("User deleted successfully", response.getBody().get("message"));
 
-    @Test
-    void testDeleteById() {
-        // Act
-        userController.deleteById("1");
-
-        // Assert
-        verify(userService, times(1)).deleteById("1");
+        // Verifica que el método deleteUser en el servicio fue llamado
+        verify(userService, times(1)).deleteUser(userId);
     }
 }
-*/

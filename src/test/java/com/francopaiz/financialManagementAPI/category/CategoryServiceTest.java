@@ -1,111 +1,106 @@
-/*
 package com.francopaiz.financialManagementAPI.category;
+
 import com.francopaiz.financialManagementAPI.model.Category;
-import com.francopaiz.financialManagementAPI.repository.category.CategoryRepository;
-import com.francopaiz.financialManagementAPI.service.category.CategoryServiceImpl;
-import org.junit.jupiter.api.BeforeEach;
+import com.francopaiz.financialManagementAPI.service.category.CategoryService;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-class CategoryServiceTest {
+@ExtendWith(MockitoExtension.class)
+public class CategoryServiceTest {
 
     @Mock
-    private CategoryRepository categoryRepository;
-
-    @InjectMocks
-    private CategoryServiceImpl categoryService;
-
-    private Category category;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-
-        category = new Category();
-        category.setId("1");
-        category.setName("Food");
-    }
+    private CategoryService categoryService;
 
     @Test
-    void testFindAll() {
-        // Arrange
+    public void testGetCategories() {
+        // Configuramos el mock para devolver una lista de categorías
         List<Category> categories = new ArrayList<>();
+        Category category = new Category();
+        category.setName("Food");
         categories.add(category);
-        when(categoryRepository.findAll()).thenReturn(categories);
+        when(categoryService.getCategories()).thenReturn(categories);
 
-        // Act
-        List<Category> result = categoryService.findAll();
-
-        // Assert
+        // Ejecutamos el método y verificamos el resultado
+        List<Category> result = categoryService.getCategories();
         assertEquals(1, result.size());
         assertEquals("Food", result.get(0).getName());
-        verify(categoryRepository, times(1)).findAll();
+        verify(categoryService, times(1)).getCategories();
     }
 
     @Test
-    void testFindById() {
-        // Arrange
-        when(categoryRepository.findById("1")).thenReturn(Optional.of(category));
+    public void testFindCategoryById() {
+        // Configuramos el mock para devolver una categoría específica
+        String id = "1";
+        Category category = new Category();
+        category.setName("Utilities");
+        when(categoryService.findCategoryById(id)).thenReturn(category);
 
-        // Act
-        Category result = categoryService.findById("1");
-
-        // Assert
+        // Ejecutamos el método y verificamos el resultado
+        Category result = categoryService.findCategoryById(id);
         assertNotNull(result);
-        assertEquals("Food", result.getName());
-        verify(categoryRepository, times(1)).findById("1");
+        assertEquals("Utilities", result.getName());
+        verify(categoryService, times(1)).findCategoryById(id);
     }
 
     @Test
-    void testSave() {
-        // Arrange
-        when(categoryRepository.save(any(Category.class))).thenReturn(category);
+    public void testFindCategoryById_NotFound() {
+        // Configuramos el mock para devolver null si la categoría no existe
+        String id = "2";
+        when(categoryService.findCategoryById(id)).thenReturn(null);
 
-        // Act
-        Category result = categoryService.save(category);
+        // Ejecutamos el método y verificamos el resultado
+        Category result = categoryService.findCategoryById(id);
+        assertNull(result);
+        verify(categoryService, times(1)).findCategoryById(id);
+    }
 
-        // Assert
+    @Test
+    public void testCreateCategory() {
+        // Configuramos el mock para devolver la categoría creada
+        Category category = new Category();
+        category.setName("Health");
+        when(categoryService.createCategory(category)).thenReturn(category);
+
+        // Ejecutamos el método y verificamos el resultado
+        Category result = categoryService.createCategory(category);
         assertNotNull(result);
-        assertEquals("Food", result.getName());
-        verify(categoryRepository, times(1)).save(any(Category.class));
+        assertEquals("Health", result.getName());
+        verify(categoryService, times(1)).createCategory(category);
     }
 
     @Test
-    void testUpdate() {
-        // Arrange
-        when(categoryRepository.findById("1")).thenReturn(Optional.of(category));
-        when(categoryRepository.save(any(Category.class))).thenReturn(category);
+    public void testUpdateCategory() {
+        // Configuramos el mock para devolver la categoría actualizada
+        String id = "1";
+        Category category = new Category();
+        category.setName("Travel");
+        when(categoryService.updateCategory(id, category)).thenReturn(category);
 
-        // Act
-        Category result = categoryService.update("1", category);
-
-        // Assert
+        // Ejecutamos el método y verificamos el resultado
+        Category result = categoryService.updateCategory(id, category);
         assertNotNull(result);
-        assertEquals("Food", result.getName());
-        verify(categoryRepository, times(1)).findById("1");
-        verify(categoryRepository, times(1)).save(any(Category.class));
+        assertEquals("Travel", result.getName());
+        verify(categoryService, times(1)).updateCategory(id, category);
     }
 
     @Test
-    void testDeleteById() {
-        // Arrange
-        doNothing().when(categoryRepository).deleteById("1");
+    public void testDeleteCategory() {
+        // Configuramos el mock para que no haga nada al eliminar
+        String id = "1";
+        doNothing().when(categoryService).deleteCategory(id);
 
-        // Act
-        categoryService.deleteById("1");
-
-        // Assert
-        verify(categoryRepository, times(1)).deleteById("1");
+        // Ejecutamos el método y verificamos la interacción
+        categoryService.deleteCategory(id);
+        verify(categoryService, times(1)).deleteCategory(id);
     }
-}*/
+}

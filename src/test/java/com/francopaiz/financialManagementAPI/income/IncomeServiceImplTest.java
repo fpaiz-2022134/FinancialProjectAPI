@@ -1,4 +1,3 @@
-/*
 package com.francopaiz.financialManagementAPI.income;
 
 
@@ -9,21 +8,25 @@ import com.francopaiz.financialManagementAPI.repository.usuario.UserRepository;
 import com.francopaiz.financialManagementAPI.service.income.IncomeServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class IncomeServiceImplTest {
 
     @Mock
@@ -32,136 +35,112 @@ class IncomeServiceImplTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private Authentication authentication;
+
+    @Mock
+    private SecurityContext securityContext;
+
     @InjectMocks
     private IncomeServiceImpl incomeService;
 
-    private Income income;
     private User user;
+    private Income income;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        user = new User("John Doe", "john@example.com", "password", "1234567890");
+
+        user = new User();
         user.setId("1");
 
-        // Usando el constructor actualizado para crear un objeto Income
-        income = new Income("Job", BigDecimal.valueOf(100.0), LocalDate.now(), user);
-        income.setId("1");
+        income = new Income();
+        income.setUser(user);
+        income.setAmount(BigDecimal.valueOf(1000.0));
+        income.setDate(LocalDate.now());
 
-        // Configurar el contexto de seguridad
-        Authentication authentication = mock(Authentication.class);
-        when(authentication.getPrincipal()).thenReturn("1");
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        // Configuración de contexto de seguridad
+        SecurityContextHolder.setContext(securityContext);
+
+        // Simular el valor de profile
+        ReflectionTestUtils.setField(incomeService, "profile", "postgres");
     }
 
     @Test
-    void testFindAll() {
-        when(incomeRepository.findAll()).thenReturn(Arrays.asList(income));
+    void createIncome_ShouldReturnCreatedIncome() {
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getPrincipal()).thenReturn(user);
+        when(userRepository.findUserById("1")).thenReturn(Optional.of(user));
+        when(incomeRepository.createIncome(income)).thenReturn(income);
 
-        List<Income> incomes = incomeService.findAll();
-
-        assertNotNull(incomes);
-        assertEquals(1, incomes.size());
-        assertEquals(BigDecimal.valueOf(100.0), incomes.get(0).getAmount());
-        verify(incomeRepository, times(1)).findAll();
-    }
-
-    @Test
-    void testFindById() {
-        when(incomeRepository.findById("1")).thenReturn(Optional.of(income));
-
-        Income foundIncome = incomeService.findById("1");
-
-        assertNotNull(foundIncome);
-        assertEquals(BigDecimal.valueOf(100.0), foundIncome.getAmount());
-        verify(incomeRepository, times(1)).findById("1");
-    }
-
-    @Test
-    void testFindByIdNotFound() {
-        when(incomeRepository.findById("1")).thenReturn(Optional.empty());
-
-        Income foundIncome = incomeService.findById("1");
-
-        assertNull(foundIncome);
-        verify(incomeRepository, times(1)).findById("1");
-    }
-
-    @Test
-    void testSave() {
-        when(userRepository.findById("1")).thenReturn(Optional.of(user));
-        when(incomeRepository.save(any(Income.class))).thenReturn(income);
-
-        Income savedIncome = incomeService.save(income);
-
-        assertNotNull(savedIncome);
-        assertEquals(BigDecimal.valueOf(100.0), savedIncome.getAmount());
-        assertEquals(user, savedIncome.getUser()); // Verifica que el usuario esté asignado
-        verify(incomeRepository, times(1)).save(any(Income.class));
-    }
-
-    @Test
-    void testUpdate() {
-        Income updatedIncome = new Income("Bonus", BigDecimal.valueOf(150.0), LocalDate.now(), user);
-
-        when(incomeRepository.findById("1")).thenReturn(Optional.of(income));
-        when(incomeRepository.save(any(Income.class))).thenReturn(updatedIncome);
-
-        Income result = incomeService.update("1", updatedIncome);
+        Income result = incomeService.createIncome(income);
 
         assertNotNull(result);
-        assertEquals(BigDecimal.valueOf(150.0), result.getAmount());
-        assertEquals("Bonus", result.getSource());
-        verify(incomeRepository, times(1)).findById("1");
-        verify(incomeRepository, times(1)).save(any(Income.class));
+        assertEquals(user, result.getUser());
+        verify(incomeRepository, times(1)).createIncome(income);
     }
 
     @Test
-    void testUpdateIncomeNotFound() {
-        Income updatedIncome = new Income("Bonus", BigDecimal.valueOf(150.0), LocalDate.now(), user);
+    void findIncomeById_ShouldReturnIncomeWhenExists() {
+        String incomeId = "123";
+        when(incomeRepository.findIncomeById(incomeId)).thenReturn(Optional.of(income));
 
-        when(incomeRepository.findById("1")).thenReturn(Optional.empty());
+        Income result = incomeService.findIncomeById(incomeId);
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            incomeService.update("1", updatedIncome);
-        });
-
-        assertEquals("Ingreso no encontrado", exception.getMessage());
-        verify(incomeRepository, times(1)).findById("1");
+        assertNotNull(result);
+        assertEquals(income, result);
+        verify(incomeRepository, times(1)).findIncomeById(incomeId);
     }
 
     @Test
-    void testDeleteById() {
-        doNothing().when(incomeRepository).deleteById("1");
+    void findIncomeById_ShouldReturnNullWhenIncomeDoesNotExist() {
+        String incomeId = "456";
+        when(incomeRepository.findIncomeById(incomeId)).thenReturn(Optional.empty());
 
-        incomeService.deleteById("1");
+        Income result = incomeService.findIncomeById(incomeId);
 
-        verify(incomeRepository, times(1)).deleteById("1");
+        assertNull(result);
+        verify(incomeRepository, times(1)).findIncomeById(incomeId);
     }
 
     @Test
-    void testFindByUser() {
-        when(incomeRepository.findByUser(user)).thenReturn(Arrays.asList(income));
+    void updateIncome_ShouldUpdateAndReturnIncome() {
+        String incomeId = "123";
+        Income updatedIncome = new Income();
+        updatedIncome.setAmount(BigDecimal.valueOf(2000.0));
 
-        List<Income> incomes = incomeService.findByUser(user);
+        when(incomeRepository.findIncomeById(incomeId)).thenReturn(Optional.of(income));
+        when(incomeRepository.updateIncome(any(Income.class))).thenReturn(income);
 
-        assertNotNull(incomes);
-        assertEquals(1, incomes.size());
-        assertEquals(BigDecimal.valueOf(100.0), incomes.get(0).getAmount());
-        verify(incomeRepository, times(1)).findByUser(user);
+        Income result = incomeService.updateIncome(incomeId, updatedIncome);
+
+        assertNotNull(result);
+        assertEquals(updatedIncome.getAmount(), result.getAmount());
+        verify(incomeRepository, times(1)).updateIncome(any(Income.class));
     }
 
     @Test
-    void testFindIncomesForAuthenticatedUser() {
-        when(userRepository.findById("1")).thenReturn(Optional.of(user));
-        when(incomeRepository.findByUser(user)).thenReturn(Arrays.asList(income));
+    void deleteIncome_ShouldDeleteIncome() {
+        String incomeId = "123";
+        doNothing().when(incomeRepository).deleteIncome(incomeId);
 
-        List<Income> incomes = incomeService.findIncomesForAuthenticatedUser();
+        incomeService.deleteIncome(incomeId);
 
-        assertNotNull(incomes);
-        assertEquals(1, incomes.size());
-        assertEquals(BigDecimal.valueOf(100.0), incomes.get(0).getAmount());
-        verify(incomeRepository, times(1)).findByUser(user);
+        verify(incomeRepository, times(1)).deleteIncome(incomeId);
+    }
+
+    @Test
+    void findIncomesForAuthenticatedUser_ShouldReturnListOfIncomes() {
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getPrincipal()).thenReturn(user);
+        when(userRepository.findUserById("1")).thenReturn(Optional.of(user));
+        when(incomeRepository.findByUser(user)).thenReturn(List.of(income));
+
+        List<Income> result = incomeService.findIncomesForAuthenticatedUser();
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(income, result.get(0));
+        verify(incomeRepository, times(2)).findByUser(user);
     }
 }
-*/

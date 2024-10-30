@@ -22,10 +22,8 @@ public class ExpenseMongo {
     private BigDecimal amount;
     private LocalDate date;
 
-    private Category category;
-    private User user;
-
-
+    private CategoryMongo category;
+    private UserMongo user;
 
 
 }

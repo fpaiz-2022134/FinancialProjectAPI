@@ -1,14 +1,19 @@
-/*
 package com.francopaiz.financialManagementAPI.usuario;
-
+import com.francopaiz.financialManagementAPI.caster.UserCaster;
+import com.francopaiz.financialManagementAPI.dto.user.UserRequestUpdate;
+import com.francopaiz.financialManagementAPI.dto.user.UserResponse;
 import com.francopaiz.financialManagementAPI.model.User;
 import com.francopaiz.financialManagementAPI.repository.usuario.UserRepository;
 import com.francopaiz.financialManagementAPI.service.user.UserServiceImpl;
+import jakarta.persistence.EntityNotFoundException;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,86 +27,131 @@ class UserServiceImplTest {
     @Mock
     private UserRepository userRepository;
 
-    @InjectMocks
-    private UserServiceImpl usuarioService;
+    @Mock
+    private UserCaster userCaster;
 
-    private User user;
+    @InjectMocks
+    private UserServiceImpl userService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        user = new User("John Doe", "john@example.com", "franco123", "1234567890");
+        ReflectionTestUtils.setField(userService, "profile", "postgres");
     }
 
     @Test
-    void testFindAll() {
-        when(userRepository.findAll()).thenReturn(Arrays.asList(user));
+    void testGetUsers() {
+        // Arrange
+        User user1 = new User();
+        User user2 = new User();
+        UserResponse response1 = new UserResponse();
+        UserResponse response2 = new UserResponse();
 
-        List<User> users = usuarioService.findAll();
+        when(userRepository.getUsers()).thenReturn(Arrays.asList(user1, user2));
+        when(userCaster.userToUserResponse(user1)).thenReturn(response1);
+        when(userCaster.userToUserResponse(user2)).thenReturn(response2);
 
-        System.out.println("User name: " + users.get(0).getName());
+        // Act
+        var result = userService.getUsers();
 
-        assertNotNull(users);
-        assertEquals(1, users.size());
-        assertEquals("John Doe", users.get(0).getName());
-        verify(userRepository, times(1)).findAll();
+        // Assert
+        assertEquals(2, result.size());
+
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+        verify(userCaster, times(2)).userToUserResponse(captor.capture());
+
+
+        List<User> capturedUsers = captor.getAllValues();
+        assertEquals(user1, capturedUsers.get(0));
+        assertEquals(user2, capturedUsers.get(1));
     }
 
-    @Test
-    void testFindById() {
-        when(userRepository.findById("2")).thenReturn(Optional.of(user));
-
-        User foundUser = usuarioService.findById("2");
-
-        assertNotNull(foundUser);
-        assertEquals("John Doe", foundUser.getName());
-        verify(userRepository, times(1)).findById("2");
-    }
 
     @Test
-    void testSave() {
-        when(userRepository.save(user)).thenReturn(user);
+    void testFindUserById_UserFound() {
+        // Arrange
+        String idUser = "1";
+        User user = new User();
+        UserResponse userResponse = new UserResponse();
+        when(userRepository.findUserById(idUser)).thenReturn(Optional.of(user));
+        when(userCaster.userToUserResponse(user)).thenReturn(userResponse);
 
-        User savedUser = usuarioService.save(user);
+        // Act
+        var result = userService.findUserById(idUser);
 
-        assertNotNull(savedUser);
-        assertEquals("John Doe", savedUser.getName());
-        verify(userRepository, times(1)).save(user);
-    }
-
-    @Test
-    void testUpdate() {
-        User updatedUser = new User( "Jane Doe", "jane@example.com", "franco123", "0987654321");
-        when(userRepository.findById("2")).thenReturn(Optional.of(user));
-        when(userRepository.save(any(User.class))).thenReturn(updatedUser);
-
-        User result = usuarioService.update("2", updatedUser);
-
+        // Assert
         assertNotNull(result);
-        assertEquals("Jane Doe", result.getName());
-        verify(userRepository, times(1)).findById("2");
-        verify(userRepository, times(1)).save(any(User.class));
+        assertEquals(userResponse, result);
+        verify(userRepository, times(1)).findUserById(idUser);
     }
 
     @Test
-    void testUpdateUserNotFound() {
-        User updatedUser = new User("Jane Doe", "jane@example.com", "franco123", "0987654321");
-        when(userRepository.findById("2")).thenReturn(Optional.empty());
+    void testFindUserById_UserNotFound() {
+        // Arrange
+        String idUser = "1";
+        when(userRepository.findUserById(idUser)).thenReturn(Optional.empty());
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            usuarioService.update("2", updatedUser);
+        // Act & Assert
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
+            userService.findUserById(idUser);
         });
-
-        assertEquals("Usuario no encontrado", exception.getMessage());
-        verify(userRepository, times(1)).findById("2");
+        assertTrue(exception.getMessage().contains("User not found with ID: " + idUser));
+        verify(userRepository, times(1)).findUserById(idUser);
     }
 
     @Test
-    void testDeleteById() {
-        doNothing().when(userRepository).deleteById("2");
+    void testUpdateUser() {
+        // Arrange
+        String idUser = "1";
+        UserRequestUpdate requestUpdate = new UserRequestUpdate();
+        requestUpdate.setName("Lionel Messi");
+        requestUpdate.setUsername("messi");
+        requestUpdate.setEmail("messi@gmail.com");
 
-        usuarioService.deleteById("2");
+        User user = new User();
+        User updatedUser = new User();
+        UserResponse userResponse = new UserResponse();
 
-        verify(userRepository, times(1)).deleteById("2");
+        when(userRepository.findUserById(idUser)).thenReturn(Optional.of(user));
+        when(userRepository.updateUser(user)).thenReturn(updatedUser);
+        when(userCaster.userToUserResponse(updatedUser)).thenReturn(userResponse);
+
+        // Act
+        var result = userService.updateUser(idUser, requestUpdate);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(userResponse, result);
+        verify(userRepository, times(1)).findUserById(idUser);
+        verify(userRepository, times(1)).updateUser(user);
     }
-}*/
+
+    @Test
+    void testDeleteUser_UserFound() {
+        // Arrange
+        String idUser = "1";
+        User user = new User();
+        when(userRepository.findUserById(idUser)).thenReturn(Optional.of(user));
+
+        // Act
+        userService.deleteUser(idUser);
+
+        // Assert
+        verify(userRepository, times(1)).findUserById(idUser);
+        verify(userRepository, times(1)).deleteUser(idUser);
+    }
+
+    @Test
+    void testDeleteUser_UserNotFound() {
+        // Arrange
+        String idUser = "1";
+        when(userRepository.findUserById(idUser)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
+            userService.deleteUser(idUser);
+        });
+        assertTrue(exception.getMessage().contains("User not found with ID: " + idUser));
+        verify(userRepository, times(1)).findUserById(idUser);
+    }
+}

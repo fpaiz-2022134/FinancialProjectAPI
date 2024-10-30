@@ -4,7 +4,11 @@ import com.francopaiz.financialManagementAPI.model.*;
 import com.francopaiz.financialManagementAPI.repository.expense.ExpenseRepository;
 import com.francopaiz.financialManagementAPI.repository.financial.FinanceRepository;
 import com.francopaiz.financialManagementAPI.repository.income.IncomeRepository;
+import com.francopaiz.financialManagementAPI.service.expense.ExpenseService;
+import com.francopaiz.financialManagementAPI.service.income.IncomeService;
+import jdk.swing.interop.SwingInterOpUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -25,10 +29,36 @@ public class FinanceServiceImpl implements FinanceService {
     @Autowired
     private IncomeRepository incomeRepository;
 
+    @Autowired
+    private IncomeService incomeService;
+
+    @Autowired
+    private ExpenseService expenseService;
+
+    @Value("${spring.profiles.active}")
+    private String profile;
+
     @Override
     public FinancialSummary generateSummary(User user, LocalDate from, LocalDate to) {
-        List<Expense> expenses = expenseRepository.findByUserAndDateBetween(user, from, to);
-        List<Income> incomes = incomeRepository.findByUserAndDateBetween(user, from, to);
+        System.out.println("Usuario que cae en generate: " + user);
+
+        List<Income> incomes;
+        List<Expense> expenses;
+        if (profile.equals("mongo")){
+             incomes = incomeService.findIncomesForAuthenticatedUser();
+            expenses = expenseService.findExpensesForAuthenticatedUser();
+        } else {
+            expenses = expenseRepository.findByUserAndDateBetween(user, from, to);
+            incomes = incomeRepository.findByUserAndDateBetween(user, from, to);
+        }
+
+
+
+
+        // PRUEBAS DE DEBUG
+        System.out.println("Gastos: " + expenses);
+        System.out.println("Ingresos: "+incomes);
+
 
         BigDecimal totalExpenses = expenses.stream()
                 .map(Expense::getAmount)

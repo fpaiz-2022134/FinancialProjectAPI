@@ -1,8 +1,10 @@
 package com.francopaiz.financialManagementAPI.repository.expense.mongo;
 
+import com.francopaiz.financialManagementAPI.caster.UserCaster;
 import com.francopaiz.financialManagementAPI.model.Expense;
 import com.francopaiz.financialManagementAPI.model.User;
 import com.francopaiz.financialManagementAPI.model.mongo.ExpenseMongo;
+import com.francopaiz.financialManagementAPI.model.mongo.UserMongo;
 import com.francopaiz.financialManagementAPI.repository.expense.ExpenseRepository;
 import com.francopaiz.financialManagementAPI.caster.ExpenseCaster;
 import lombok.RequiredArgsConstructor;
@@ -25,10 +27,11 @@ public class ExpenseRepositoryMongo implements ExpenseRepository {
 
     private final ExpenseRepositoryNoSql expenseRepositoryNoSql; // Repositorio NoSQL para operaciones CRUD.
     private final ExpenseCaster expenseCaster; // Utilidad para convertir entre entidades.
-
-    public ExpenseRepositoryMongo(ExpenseRepositoryNoSql expenseRepositoryNoSql, ExpenseCaster expenseCaster) {
+    private final UserCaster userCaster;
+    public ExpenseRepositoryMongo(ExpenseRepositoryNoSql expenseRepositoryNoSql, ExpenseCaster expenseCaster, UserCaster userCaster) {
         this.expenseRepositoryNoSql = expenseRepositoryNoSql;
         this.expenseCaster = expenseCaster;
+        this.userCaster = userCaster;
     }
 
     /**
@@ -93,11 +96,21 @@ public class ExpenseRepositoryMongo implements ExpenseRepository {
 
     @Override
     public List<Expense> findByUser(User user) {
-        return List.of();
+        UserMongo userMongo = userCaster.userToUserMongo(user);
+        return expenseRepositoryNoSql.findByUser(userMongo).stream()
+                .map(expenseCaster::expenseMongoToExpense)
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<Expense> findByUserAndDateBetween(User user, LocalDate startDate, LocalDate endDate) {
-        return List.of();
+        System.out.println("User que cae en expense: " + user);
+        UserMongo userMongo = userCaster.userToUserMongo(user);
+
+        System.out.println(expenseRepositoryNoSql.findByUserAndDateBetween(userMongo, startDate, endDate));
+        return expenseRepositoryNoSql.findByUserAndDateBetween(userMongo, startDate, endDate).stream() // Obtiene los gastos del usuario en el rango de fechas.
+                .map(expenseCaster::expenseMongoToExpense) // Convierte cada gasto a Expense.
+                .collect(Collectors.toList()); // Recoge los gastos en una lista.
+
     }
 }

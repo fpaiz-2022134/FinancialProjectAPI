@@ -1,4 +1,3 @@
-/*
 package com.francopaiz.financialManagementAPI.category;
 
 import com.francopaiz.financialManagementAPI.model.Category;
@@ -42,7 +41,7 @@ class CategoryControllerTest {
     void testFindAll() {
         // Arrange
         List<Category> categories = Arrays.asList(category);
-        when(categoryService.findAll()).thenReturn(categories);
+        when(categoryService.getCategories()).thenReturn(categories);
 
         // Act
         List<Category> result = categoryController.findAll();
@@ -50,46 +49,46 @@ class CategoryControllerTest {
         // Assert
         assertEquals(1, result.size());
         assertEquals("Groceries", result.get(0).getName());
-        verify(categoryService, times(1)).findAll();
+        verify(categoryService, times(1)).getCategories();
     }
 
     @Test
     void testFindById() {
         // Arrange
-        when(categoryService.findById("1")).thenReturn(category);
+        when(categoryService.findCategoryById("1")).thenReturn(category);
 
         // Act
         Category result = categoryController.findById("1");
 
         // Assert
         assertEquals("Groceries", result.getName());
-        verify(categoryService, times(1)).findById("1");
+        verify(categoryService, times(1)).findCategoryById("1");
     }
 
     @Test
     void testSave() {
         // Arrange
-        when(categoryService.save(any(Category.class))).thenReturn(category);
+        when(categoryService.createCategory(any(Category.class))).thenReturn(category);
 
         // Act
         Category result = categoryController.save(category);
 
         // Assert
         assertEquals("Groceries", result.getName());
-        verify(categoryService, times(1)).save(any(Category.class));
+        verify(categoryService, times(1)).createCategory(any(Category.class));
     }
 
     @Test
     void testUpdate() {
         // Arrange
-        when(categoryService.update(eq("1"), any(Category.class))).thenReturn(category);
+        when(categoryService.updateCategory(eq("1"), any(Category.class))).thenReturn(category);
 
         // Act
         Category result = categoryController.update("1", category);
 
         // Assert
         assertEquals("Groceries", result.getName());
-        verify(categoryService, times(1)).update(eq("1"), any(Category.class));
+        verify(categoryService, times(1)).updateCategory(eq("1"), any(Category.class));
     }
 
     @Test
@@ -98,6 +97,6 @@ class CategoryControllerTest {
         categoryController.deleteById("1");
 
         // Assert
-        verify(categoryService, times(1)).deleteById("1");
+        verify(categoryService, times(1)).deleteCategory("1");
     }
-}*/
+}

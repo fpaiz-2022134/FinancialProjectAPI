@@ -1,4 +1,3 @@
-/*
 package com.francopaiz.financialManagementAPI.expense;
 
 import com.francopaiz.financialManagementAPI.controller.expense.ExpenseController;
@@ -53,7 +52,7 @@ class ExpenseControllerTest {
     void testFindAll() {
         // Arrange
         List<Expense> expenses = Arrays.asList(expense);
-        when(expenseService.findAll()).thenReturn(expenses);
+        when(expenseService.getExpenses()).thenReturn(expenses);
 
         // Act
         List<Expense> result = expenseController.findAll();
@@ -61,26 +60,26 @@ class ExpenseControllerTest {
         // Assert
         assertEquals(1, result.size());
         assertEquals(BigDecimal.valueOf(100.00), result.get(0).getAmount());
-        verify(expenseService, times(1)).findAll();
+        verify(expenseService, times(1)).getExpenses();
     }
 
     @Test
     void testFindById() {
         // Arrange
-        when(expenseService.findById("1")).thenReturn(expense);
+        when(expenseService.findExpenseById("1")).thenReturn(expense);
 
         // Act
         Expense result = expenseController.findById("1");
 
         // Assert
         assertEquals(BigDecimal.valueOf(100.00), result.getAmount());
-        verify(expenseService, times(1)).findById("1");
+        verify(expenseService, times(1)).findExpenseById("1");
     }
 
     @Test
     void testSaveWithCategory() {
         // Arrange
-        when(expenseService.save(any(Expense.class))).thenReturn(expense);
+        when(expenseService.createExpense(any(Expense.class))).thenReturn(expense);
 
         // Act
         Expense result = expenseController.save("1", expense);
@@ -88,16 +87,15 @@ class ExpenseControllerTest {
         // Assert
         assertEquals(BigDecimal.valueOf(100.00), result.getAmount());
         assertEquals("Food", result.getCategory().getName());
-        verify(expenseService, times(1)).save(any(Expense.class));
-        verify(categoryService, never()).findById(anyString());
+        verify(categoryService, never()).findCategoryById(anyString());
     }
 
     @Test
     void testSaveWithoutCategory() {
         // Arrange
         expense.setCategory(null);
-        when(categoryService.findById("1")).thenReturn(category);
-        when(expenseService.save(any(Expense.class))).thenReturn(expense);
+        when(categoryService.findCategoryById("1")).thenReturn(category);
+        when(expenseService.createExpense(any(Expense.class))).thenReturn(expense);
 
         // Act
         Expense result = expenseController.save("1", expense);
@@ -105,21 +103,21 @@ class ExpenseControllerTest {
         // Assert
         assertEquals(BigDecimal.valueOf(100.00), result.getAmount());
         assertEquals("Food", result.getCategory().getName());
-        verify(categoryService, times(1)).findById("1");
-        verify(expenseService, times(1)).save(any(Expense.class));
+        verify(categoryService, times(1)).findCategoryById("1");
+        verify(expenseService, times(1)).createExpense(any(Expense.class));
     }
 
     @Test
     void testUpdate() {
         // Arrange
-        when(expenseService.update(eq("1"), any(Expense.class))).thenReturn(expense);
+        when(expenseService.updateExpense(eq("1"), any(Expense.class))).thenReturn(expense);
 
         // Act
         Expense result = expenseController.update("1", expense);
 
         // Assert
         assertEquals(BigDecimal.valueOf(100.00), result.getAmount());
-        verify(expenseService, times(1)).update(eq("1"), any(Expense.class));
+        verify(expenseService, times(1)).updateExpense(eq("1"), any(Expense.class));
     }
 
     @Test
@@ -128,14 +126,14 @@ class ExpenseControllerTest {
         expenseController.deleteById("1");
 
         // Assert
-        verify(expenseService, times(1)).deleteById("1");
+        verify(expenseService, times(1)).deleteExpense("1");
     }
 
     @Test
-    void testFindIncomesForAuthenticatedUser() {
+    void testFindExpensesForAuthenticatedUser() {
         // Arrange
         List<Expense> expenses = Arrays.asList(expense);
-        when(expenseService.findIncomesForAuthenticatedUser()).thenReturn(expenses);
+        when(expenseService.findExpensesForAuthenticatedUser()).thenReturn(expenses);
 
         // Act
         List<Expense> result = expenseController.findIncomesForAuthenticatedUser();
@@ -143,6 +141,6 @@ class ExpenseControllerTest {
         // Assert
         assertEquals(1, result.size());
         assertEquals(BigDecimal.valueOf(100.00), result.get(0).getAmount());
-        verify(expenseService, times(1)).findIncomesForAuthenticatedUser();
+        verify(expenseService, times(1)).findExpensesForAuthenticatedUser();
     }
-}*/
+}

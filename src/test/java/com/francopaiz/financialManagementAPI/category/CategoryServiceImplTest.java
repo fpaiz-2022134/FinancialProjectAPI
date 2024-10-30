@@ -1,23 +1,24 @@
-/*
 package com.francopaiz.financialManagementAPI.category;
-
 import com.francopaiz.financialManagementAPI.model.Category;
 import com.francopaiz.financialManagementAPI.repository.category.CategoryRepository;
 import com.francopaiz.financialManagementAPI.service.category.CategoryServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class CategoryServiceImplTest {
+@ExtendWith(MockitoExtension.class)
+public class CategoryServiceImplTest {
 
     @Mock
     private CategoryRepository categoryRepository;
@@ -25,96 +26,126 @@ class CategoryServiceImplTest {
     @InjectMocks
     private CategoryServiceImpl categoryService;
 
-    private Category category;
-
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-        category = new Category("Food");
-        category.setId("1");
+        // Establecemos el perfil de Spring como "postgres" para los tests de formato de ID
+        ReflectionTestUtils.setField(categoryService, "profile", "postgres");
     }
 
     @Test
-    void testFindAll() {
-        when(categoryRepository.findAll()).thenReturn(Arrays.asList(category));
+    public void testGetCategories() {
+        // Configuramos el mock para el repositorio
+        List<Category> categories = new ArrayList<>();
+        Category category = new Category();
+        category.setName("Food");
+        categories.add(category);
+        when(categoryRepository.getCategories()).thenReturn(categories);
 
-        List<Category> categories = categoryService.findAll();
-
-        assertNotNull(categories);
-        assertEquals(1, categories.size());
-        assertEquals("Food", categories.get(0).getName());
-        verify(categoryRepository, times(1)).findAll();
+        // Ejecutamos el método y verificamos el resultado
+        List<Category> result = categoryService.getCategories();
+        assertEquals(1, result.size());
+        assertEquals("Food", result.get(0).getName());
+        verify(categoryRepository, times(1)).getCategories();
     }
 
     @Test
-    void testFindById() {
-        when(categoryRepository.findById("1")).thenReturn(Optional.of(category));
+    public void testFindCategoryById_ValidId() {
+        // Configuramos el mock para el repositorio
+        String id = "1";
+        Category category = new Category();
+        category.setName("Utilities");
+        when(categoryRepository.findCategoryById(id)).thenReturn(Optional.of(category));
 
-        Category foundCategory = categoryService.findById("1");
-
-        assertNotNull(foundCategory);
-        assertEquals("Food", foundCategory.getName());
-        verify(categoryRepository, times(1)).findById("1");
-    }
-
-    @Test
-    void testFindByIdNotFound() {
-        when(categoryRepository.findById("1")).thenReturn(Optional.empty());
-
-        Category foundCategory = categoryService.findById("1");
-
-        assertNull(foundCategory);
-        verify(categoryRepository, times(1)).findById("1");
-    }
-
-    @Test
-    void testSave() {
-        when(categoryRepository.save(any(Category.class))).thenReturn(category);
-
-        Category savedCategory = categoryService.save(category);
-
-        assertNotNull(savedCategory);
-        assertEquals("Food", savedCategory.getName());
-        verify(categoryRepository, times(1)).save(any(Category.class));
-    }
-
-    @Test
-    void testUpdate() {
-        Category updatedCategory = new Category("Beverages");
-        updatedCategory.setId("1");
-
-        when(categoryRepository.findById("1")).thenReturn(Optional.of(category));
-        when(categoryRepository.save(any(Category.class))).thenReturn(updatedCategory);
-
-        Category result = categoryService.update("1", updatedCategory);
-
+        // Ejecutamos el método y verificamos el resultado
+        Category result = categoryService.findCategoryById(id);
         assertNotNull(result);
-        assertEquals("Beverages", result.getName());
-        verify(categoryRepository, times(1)).findById("1");
-        verify(categoryRepository, times(1)).save(any(Category.class));
+        assertEquals("Utilities", result.getName());
+        verify(categoryRepository, times(1)).findCategoryById(id);
     }
 
     @Test
-    void testUpdateCategoryNotFound() {
-        Category updatedCategory = new Category("Beverages");
-        updatedCategory.setId("1");
-
-        when(categoryRepository.findById("1")).thenReturn(Optional.empty());
-
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            categoryService.update("1", updatedCategory);
+    public void testFindCategoryById_InvalidIdFormat() {
+        // Ejecutamos el método y verificamos que lanza una excepción por formato de ID inválido
+        String invalidId = "invalid_id";
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            categoryService.findCategoryById(invalidId);
         });
-
-        assertEquals("Categoría no encontrada", exception.getMessage());
-        verify(categoryRepository, times(1)).findById("1");
+        assertTrue(exception.getMessage().contains("Formato de ID no válido para PostgreSQL"));
+        verify(categoryRepository, never()).findCategoryById(anyString());
     }
 
     @Test
-    void testDeleteById() {
-        doNothing().when(categoryRepository).deleteById("1");
+    public void testCreateCategory() {
+        // Configuramos el mock para el repositorio
+        Category category = new Category();
+        category.setName("Health");
+        when(categoryRepository.createCategory(category)).thenReturn(category);
 
-        categoryService.deleteById("1");
-
-        verify(categoryRepository, times(1)).deleteById("1");
+        // Ejecutamos el método y verificamos el resultado
+        Category result = categoryService.createCategory(category);
+        assertNotNull(result);
+        assertEquals("Health", result.getName());
+        verify(categoryRepository, times(1)).createCategory(category);
     }
-}*/
+
+    @Test
+    public void testUpdateCategory_ValidId() {
+        // Configuramos el mock para el repositorio
+        String id = "1";
+        Category existingCategory = new Category();
+        existingCategory.setName("Entertainment");
+
+        Category updatedCategory = new Category();
+        updatedCategory.setName("Travel");
+
+        when(categoryRepository.findCategoryById(id)).thenReturn(Optional.of(existingCategory));
+        when(categoryRepository.updateCategory(existingCategory)).thenReturn(updatedCategory);
+
+        // Ejecutamos el método y verificamos el resultado
+        Category result = categoryService.updateCategory(id, updatedCategory);
+        assertNotNull(result);
+        assertEquals("Travel", result.getName());
+        verify(categoryRepository, times(1)).findCategoryById(id);
+        verify(categoryRepository, times(1)).updateCategory(existingCategory);
+    }
+
+    @Test
+    public void testUpdateCategory_CategoryNotFound() {
+        // Configuramos el mock para el repositorio
+        String id = "2";
+        Category updatedCategory = new Category();
+        updatedCategory.setName("Education");
+
+        when(categoryRepository.findCategoryById(id)).thenReturn(Optional.empty());
+
+        // Ejecutamos el método y verificamos que lanza una excepción por categoría no encontrada
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            categoryService.updateCategory(id, updatedCategory);
+        });
+        assertEquals("Categoría no encontrada", exception.getMessage());
+        verify(categoryRepository, times(1)).findCategoryById(id);
+        verify(categoryRepository, never()).updateCategory(any(Category.class));
+    }
+
+    @Test
+    public void testDeleteCategory_ValidId() {
+        // Configuramos el mock para el repositorio
+        String id = "1";
+        doNothing().when(categoryRepository).deleteCategory(id);
+
+        // Ejecutamos el método
+        categoryService.deleteCategory(id);
+        verify(categoryRepository, times(1)).deleteCategory(id);
+    }
+
+    @Test
+    public void testDeleteCategory_InvalidIdFormat() {
+        // Ejecutamos el método y verificamos que lanza una excepción por formato de ID inválido
+        String invalidId = "invalid_id";
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            categoryService.deleteCategory(invalidId);
+        });
+        assertTrue(exception.getMessage().contains("Formato de ID no válido para PostgreSQL"));
+        verify(categoryRepository, never()).deleteCategory(anyString());
+    }
+}

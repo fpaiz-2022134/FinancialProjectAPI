@@ -39,14 +39,15 @@ public class FinanceController {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String idUser = ((User) userDetails).getId();
 
-        System.out.println(idUser);
+        System.out.println("Id del usuario" + idUser);
 
         UserResponse userFound = userService.findUserById(idUser);
-        System.out.println(userFound);
+        System.out.println("Usuario de UserResponse"+userFound);
 
         User userTransformed = userCaster.userResponseToUser(userFound);
-        System.out.println(userTransformed);
+        System.out.println("Usuario de User: " + userTransformed);
         FinancialSummary summary = financialService.generateSummary(userTransformed, from, to);
+        System.out.println("SUMMARY: " + summary);
         return ResponseEntity.ok(summary);
     }
 }

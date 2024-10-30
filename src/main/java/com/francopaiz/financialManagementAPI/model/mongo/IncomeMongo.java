@@ -16,7 +16,7 @@ public class IncomeMongo{
     private String source;
     private BigDecimal amount;
     private LocalDate date;
-    private User user;
+    private UserMongo user;
 
 
 }

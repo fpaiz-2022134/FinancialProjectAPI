@@ -3,7 +3,9 @@ package com.francopaiz.financialManagementAPI.caster;
 import com.francopaiz.financialManagementAPI.model.Category;
 import com.francopaiz.financialManagementAPI.model.Expense;
 import com.francopaiz.financialManagementAPI.model.User;
+import com.francopaiz.financialManagementAPI.model.mongo.CategoryMongo;
 import com.francopaiz.financialManagementAPI.model.mongo.ExpenseMongo;
+import com.francopaiz.financialManagementAPI.model.mongo.UserMongo;
 import com.francopaiz.financialManagementAPI.model.postgres.CategoryPostgres;
 import com.francopaiz.financialManagementAPI.model.postgres.ExpensePostgres;
 import com.francopaiz.financialManagementAPI.model.postgres.UserPostgres;
@@ -26,8 +28,9 @@ public class ExpenseCaster {
 
     public ExpensePostgres expenseToExpensePostgres(Expense expense) {
         ExpensePostgres expensePostgres = new ExpensePostgres();
-
-        expensePostgres.setId(Long.valueOf(expense.getId()));
+        if (expense.getId()!= null){
+            expensePostgres.setId(Long.valueOf(expense.getId()));
+        }
         expensePostgres.setDescription(expense.getDescription());
         expensePostgres.setAmount(expense.getAmount());
         expensePostgres.setDate(expense.getDate());
@@ -89,8 +92,20 @@ public class ExpenseCaster {
         expenseMongo.setDescription(expense.getDescription());
         expenseMongo.setAmount(expense.getAmount());
         expenseMongo.setDate(expense.getDate());
-        expenseMongo.setCategory(expense.getCategory());
-        expenseMongo.setUser(expense.getUser());
+
+        if(expense.getCategory() != null){
+            CategoryMongo categoryMongo = categoryCaster.categoryToCategoryMongo(expense.getCategory());
+            expenseMongo.setCategory(categoryMongo);
+        }
+
+       /* expenseMongo.setCategory(expense.getCategory());*/
+
+        if (expense.getUser() != null){
+            UserMongo userMongo = userCaster.userToUserMongo(expense.getUser());
+            expenseMongo.setUser(userMongo);
+        }
+
+       /* expenseMongo.setUser(expense.getUser());*/
         return expenseMongo;
     }
 
@@ -101,13 +116,26 @@ public class ExpenseCaster {
      * @return Un objeto Expense que representa el gasto.
      */
     public Expense expenseMongoToExpense(ExpenseMongo expenseMongo) {
+        System.out.println(expenseMongo);
         Expense expense = new Expense();
         expense.setId(expenseMongo.getId());
         expense.setDescription(expenseMongo.getDescription());
         expense.setAmount(expenseMongo.getAmount());
         expense.setDate(expenseMongo.getDate());
-        expense.setCategory(expenseMongo.getCategory());
+
+        if(expenseMongo.getCategory() != null){
+            Category category = categoryCaster.categoryMongoToCategory(expenseMongo.getCategory());
+            expense.setCategory(category);
+        }
+
+        if(expenseMongo.getUser() != null){
+            User user = userCaster.userMongoToUser(expenseMongo.getUser());
+            expense.setUser(user);
+        }
+       /* expense.setCategory(expenseMongo.getCategory());
         expense.setUser(expenseMongo.getUser());
+*/
+        System.out.println(expense);
         return expense;
     }
 }
