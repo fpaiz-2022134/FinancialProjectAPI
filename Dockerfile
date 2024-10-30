@@ -17,13 +17,13 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # Copia el archivo JAR de tu aplicación desde la fase de construcción
-COPY --from=build /app/target/financial-project.jar .
+COPY --from=build /app/target/financialManagementAPI-0.0.1-SNAPSHOT.jar app.jar
 
 # Copia el archivo de configuración
-COPY --from=build /app/src/main/resources/application.properties .
+COPY --from=build /app/src/main/resources/application.properties application.properties
 
 # Exponer el puerto que utilizará la aplicación
 EXPOSE 8080
 
 # Define el comando de inicio de la aplicación
-CMD ["java", "-jar", "financial-project.jar"]
+CMD ["java", "-jar", "app.jar"]
